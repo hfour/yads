@@ -1,0 +1,16 @@
+.env
+.cache
+node_modules/
+build/
+dist/
+*.log
+**/dev/build.js
+**/dev/build.js.map
+npm-debug.log
+package-lock.json
+.webpack-cache
+.DS_Store
+# coverage
+.nyc_output
+coverage
+*.swp

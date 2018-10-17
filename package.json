@@ -1,0 +1,48 @@
+{
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "mobx": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.0",
+    "asciitree": "^1.0.2",
+    "jest": "^23.4.1",
+    "prettier": "^1.13.7",
+    "ts-jest": "^23.0.1",
+    "typescript": "^2.9.2"
+  },
+  "scripts": {
+    "test": "jest",
+    "browser": "parcel dev/index.html --no-hmr"
+  },
+  "jest": {
+    "verbose": true,
+    "globals": {
+      "ts-jest": {
+        "tsConfigFile": "tsconfig.json",
+        "skipBabel": true
+      }
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/tests/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/tests/fileMock.json",
+      "\\.(css|scss)$": "<rootDir>/tests/styleMock.json"
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "\\.util\\.ts$",
+      "\\.ignore\\.ts$"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}"
+    ]
+  }
+}
