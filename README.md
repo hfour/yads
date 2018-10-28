@@ -22,8 +22,8 @@ const evenCount = myArray.reduce((count, el) => count + (el.value % 2 === 0 ? 1 
 ```
 
 If your array is large and gets mutated often, this becomes inefficient, so you must devise some
-caching mechanism. This data structure makes caching fast and easy for very large arrays. You could
-do something like this:
+caching mechanism. This data structure makes caching fast and easy for very large arrays whose
+operations on elements are associative. You could do something like this:
 
 ```typescript
 import { EvenCount } from './someplace';
@@ -46,6 +46,22 @@ The identity value is a special value for an associative operation. When the ope
 on any value (A) with the identity value (I), the result is always (A). For addition, the identity
 value is `0`, and for multiplication it's `1`. For example: `5 + 0 = 5` and `1 * 6 = 6`.
 
+The current design is dependent on associativity since we're folding form the left and there is no
+order defined between any child nodes. Consider the following example:
+
+```
+      R___
+     /    \
+    a      b
+   / \    / \
+  e1  e2 e3  e4
+```
+
+Since there is a partial fold `pf` defined on `a` and `b`, we require associativity so that
+`pf(a) o pf(b) = pf(R)` for any operation `o`. This will not be fulfilled e.g. for the operation
+`-` since we will have that `pf(a) = e1 - e2` and `pf(b) = e3 - e4`, but
+`pf(a) - pf(b) = e1 - e2 - e3 + e4`, which is different from `pf(R) = e1 - e2 - e3 - e4`.
+
 We also need a way to express how the cache values are extracted from a single element in the array.
 We do this by defining a function property on the monoid called `getCacheValue`.
 
@@ -65,7 +81,7 @@ const EvenCount: MonoidObj<number> = Object.freeze({
   // Addition's identity is 0
   identity: 0,
   // Cache value is 1 if data val is even
-  getCacheValue: (leaf) => leaf.data.value % 2 === 0 : 1 : 0
+  getCacheValue: (leaf) => leaf.data.value % 2 === 0 ? 1 : 0
 });
 
 const myYadsArray = fromArray(myArray);
@@ -194,7 +210,7 @@ const length = myYadsArray.getField(Size); // Returns 6
 
 ## Dependencies
 
-The data structure depends on MobX. This part of the documentation should be extended to explan why
+The data structure depends on MobX. This part of the documentation should be extended to explain why
 and how Mobx can be leveraged to compute stuff.
 
 ## Contributing
@@ -213,7 +229,7 @@ You will need yarn (https://yarnpkg.com/en/) and parcel (https://parceljs.org/).
    "http://localhost:1234" to play around with it in the browser. Check out the `dev` folder for the
    browser code.
 
-## Kown bugs
+## Known bugs
 
 1. The `remove` helper method can leave the tree in an unbalanced state which throws an error. This
    example is illustrated in the `dev` folder when you run it in the browser (open the console, see
