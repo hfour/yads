@@ -1,3 +1,3 @@
 What is this?
 
-This folder contains a small client-side app that you can run with Parcel. laksmd laksmd as dlkmasd
+This folder contains a small client-side app that you can run with Parcel.
