@@ -29,14 +29,14 @@ function distribute<T>(nodes: BaseNode<T>[]): INode<T> {
 
   let mkINode = (args) => {
 	return new (Function.prototype.bind.apply(INode, [null].concat(args)));
-  }
+  };
 
   var result = nodes;
 
   while (1 != result.length) {
     var tmpresult = [];
 
-    for (var i = 0; i < result.length; i += 3) {
+    for (let i = 0; i < result.length; i += 3) {
       tmpresult.push(mkINode(result.slice(i, i + 3)));
     }
 
