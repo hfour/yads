@@ -10,8 +10,7 @@ export const Size: MonoidObj<number> = Object.freeze({
 });
 
 /**
- * A not-so-efficient way to create a tree from arrays.
- * TODO: Optimize.
+ * Create a tree from array.
  */
 function distribute<T>(nodes: BaseNode<T>[]): INode<T> {
   const len = nodes.length;
@@ -28,21 +27,23 @@ function distribute<T>(nodes: BaseNode<T>[]): INode<T> {
     }
   }
 
-  const result: INode<T>[] = [];
-
-  for (let i = 0; i < len; i += 2) {
-    if (i + 3 === len) {
-      result.push(new INode(nodes[i], nodes[i + 1], nodes[i + 2]));
-      break;
-    } else if (i + 1 === len) {
-      result.push(new INode(nodes[i]));
-      break;
-    } else {
-      result.push(new INode(nodes[i], nodes[i + 1]));
-    }
+  let mkINode = (args) => {
+	return new (Function.prototype.bind.apply(INode, [null].concat(args)));
   }
 
-  return distribute(result);
+  var result = nodes;
+
+  while (1 != result.length) {
+    var tmpresult = [];
+
+    for (var i = 0; i < result.length; i += 3) {
+      tmpresult.push(mkINode(result.slice(i, i + 3)));
+    }
+
+    result = tmpresult;
+  }
+
+  return new INode(result[0]);
 }
 
 export function fromArray<T>(data: T[]) {
