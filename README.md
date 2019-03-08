@@ -103,10 +103,11 @@ we talk about next.
 
 ## Internals
 
-The data structure is implemented as a modified 2-3 tree (https://en.wikipedia.org/wiki/2–3_tree).
+The data structure is implemented as a modified [2-3 tree](https://en.wikipedia.org/wiki/2–3_tree).
 The difference from regular 2-3 trees is that data is only kept in the leaf nodes, while the
-internal nodes (iNodes) are only used to store the cummulative cached values for their descendants.
-All leaf nodes are kept at the same depth which makes it easier to balance the tree.
+internal nodes (iNodes) are only used to store the cumulative cached values for their descendants.
+Additionally, ordering of the elements is _not_ taken into consideration. All leaf nodes are kept at
+the same depth which makes it easier to balance the tree.
 
 The leaf nodes have a `data` property which references the actual data element they represent. The
 leaf nodes are passed to the `getCacheValue` function instead of the data elements - that's why you
