@@ -1,19 +1,20 @@
 {
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
-    "mobx": "^5.1.0"
+    "mobx": "^5.1.0",
+    "parcel-bundler": "^1.10.3"
   },
   "devDependencies": {
     "@types/jest": "^23.3.0",
     "asciitree": "^1.0.2",
+    "babel-polyfill": "^6.26.0",
     "jest": "^23.4.1",
     "prettier": "^1.13.7",
     "ts-jest": "^23.0.1",
     "typescript": "^2.9.2"
   },
   "scripts": {
-    "test": "jest",
-    "browser": "parcel dev/index.html --no-hmr"
+    "test": "node_modules/.bin/jest",
+    "browser": "node_modules/.bin/parcel dev/index.html --no-hmr"
   },
   "jest": {
     "verbose": true,

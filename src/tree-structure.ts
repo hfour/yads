@@ -332,16 +332,12 @@ export class INode<T> extends BaseNode<T> {
   /**
    * Rebalances an INode by doing the following:
    *  - If the INode has no children, it gets destroyed
-   *  - If it has only one children it gets merged with its left or right sibling
+   *  - If it has only one child it gets merged with its left or right sibling
    *    depending on which one has 2 children (right if both have 2)
    *
-   * Rebalancing works recursively up to the root.
-   *
-   * De-optimization pitfall. This might seem like a good idea, but it's not:
-   * Instead of immediately splitting the node when it gets to 4 children,
-   * move the last child into the next cousin, if it has only 2 children.
-   * This will tend to create nodes with 3 children too often, and will result
-   * in more frequent calls to rebalance().
+   * The function expects that **only** the node on which rebalance is called is
+   * in an imbalanced state. It won't work if the tree has other nodes that are
+   * not balanced (have 0, 1 or 4 children).
    */
   @action
   rebalance() {
@@ -371,25 +367,29 @@ export class INode<T> extends BaseNode<T> {
       }
 
       const moved = this.pop(0);
-      let left = this.prevNodeAtSameLevel as INode<T>;
-      let right = this.nextNodeAtSameLevel as INode<T>;
+      const left = this.prevSibling as INode<T>;
+      const right = this.nextSibling as INode<T>;
 
-      if (!left && !right) {
-        // This is the only node in the tree, and it's deeper
-        const parent = this.parent;
-        parent.pop(this.index);
-        parent.push(moved);
-        parent.rebalance();
-      } else if (!left || (right && right.size < left.size)) {
-        // No place to the left, or the right side has more room
+      let rebalanceSibling: INode<T> = null;
+      if (!left || (right && right.size < left.size)) {
         right.push(moved, 0);
-        this.rebalance();
-        right.rebalance();
+        if (right.size === 4) {
+          rebalanceSibling = right;
+        }
       } else {
-        // All else being equal, prefer merging to the left
         left.push(moved);
-        this.rebalance();
-        left.rebalance();
+        if (left.size === 4) {
+          rebalanceSibling = left;
+        }
+      }
+
+      const parent = this.parent;
+      parent.pop(this.index);
+      if (rebalanceSibling) {
+        rebalanceSibling.rebalance();
+      }
+      if (parent.size === 1) {
+        parent.rebalance();
       }
     } else if (this.size === 4) {
       const second = this.pop();

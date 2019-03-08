@@ -1,58 +1,98 @@
 import 'babel-polyfill';
 import { autorun } from 'mobx';
-import { fromArray, atIndex, insert, remove, Size, INode } from '../src';
-import { printtree } from '../tests/test.util';
+import { fromArray, atIndex, insert, remove, Size, INode, Leaf } from '../src';
+import { printtree, isBalanced } from '../tests/test.util';
 
-const INITIAL_SIZE = 20;
+// Handcrafting a specific tree
+// const specTree = new INode(
+//   new INode(
+//     new INode(
+//       new INode(new Leaf(0), new Leaf(1)),
+//       new INode(new Leaf(2), new Leaf(2), new Leaf(4)),
+//       new INode(new Leaf(1), new Leaf(6), new Leaf(7)),
+//     ),
+//     new INode(new INode(new Leaf(8), new Leaf(9)), new INode(new Leaf(10), new Leaf(11))),
+//   ),
+//   new INode(
+//     new INode(
+//       new INode(new Leaf(12), new Leaf(0), new Leaf(13)),
+//       new INode(new Leaf(14), new Leaf(15)),
+//     ),
+//     new INode(new INode(new Leaf(16), new Leaf(17)), new INode(new Leaf(18), new Leaf(19))),
+//   ),
+// );
+
+// printtree(specTree);
+// remove(specTree, 8, 1);
+// printtree(specTree);
+
+const INITIAL_SIZE = 20000;
 const ITERATIONS = 1000;
 
 // ---------------------------
 // Creating an array
-console.log(`Creating a ${INITIAL_SIZE} element array by pushing numbers:`);
-console.time('time');
 const data: number[] = [];
 for (let i = 0; i < INITIAL_SIZE; ++i) {
   data.push(i);
 }
-console.timeEnd('time');
-console.log(`Create an array with ${data.length} elements`);
 
-// ---------------------------
-// Creating a tree
-console.log(`Creating a ${INITIAL_SIZE} element tree by pushing numbers:`);
-console.time('time');
+// // ---------------------------
+// // Creating a tree
+const CREATION = `Creating a tree with ${INITIAL_SIZE} elements took`;
+console.time(CREATION);
 const tree = fromArray(data);
-console.timeEnd('time');
-console.log(`Create a tree with ${tree.getField(Size)} elements`);
+console.timeEnd(CREATION);
 
 const disposer = autorun(() => tree.getField(Size));
 
-// ---------------------------
-// Pushing and popping a lot of times
-console.log(`Yads: Inserting and removing in the middle ${ITERATIONS} times:`);
-console.time('time');
-for (let i = 0; i < ITERATIONS; ++i) {
-  const ins = Math.floor(Math.random() * INITIAL_SIZE);
-  const rem = Math.floor(Math.random() * INITIAL_SIZE);
-  console.log('indices', ins, rem);
-  printtree(tree);
-  insert(tree, ins, [i]);
-  printtree(tree);
-  remove(tree, rem, 1);
-  printtree(tree);
-  console.log('--END ITER--');
-}
-console.timeEnd('time');
+const INSERTION = `Inserting another ${INITIAL_SIZE} elements in that tree took`;
+console.time(INSERTION);
+insert(tree, INITIAL_SIZE / 2, data);
+console.timeEnd(INSERTION);
 
-// ---------------------------
-// Pushing and popping a lot of times
-console.log(`Array: Inserting and removing in the middle ${ITERATIONS} times:`);
-console.time('time');
-for (let i = 0; i < ITERATIONS; ++i) {
-  data.splice(Math.floor(Math.random() * INITIAL_SIZE), 0, i);
-  data.splice(Math.floor(Math.random() * INITIAL_SIZE), 1);
-}
-console.timeEnd('time');
+const DELETION = `Removing ${INITIAL_SIZE} elements in that tree took`;
+console.time(DELETION);
+remove(tree, INITIAL_SIZE, INITIAL_SIZE);
+console.timeEnd(DELETION);
+
+// // ---------------------------
+// // Pushing and popping a lot of times
+
+[10, 5, 3, 1].forEach(num => {
+  const insertees = Array(num).fill(3);
+
+  console.log(
+    `\nInserting and removing ${num} elements at a time in the tree of ${INITIAL_SIZE} elements, at random positions`,
+  );
+
+  const ITERS = `${ITERATIONS} iterations took`;
+  console.time(ITERS);
+  for (let i = 0; i < ITERATIONS; ++i) {
+    const ins = Math.floor(Math.random() * INITIAL_SIZE);
+    const rem = Math.floor(Math.random() * INITIAL_SIZE);
+    // console.log('indices', ins, rem);
+    // printtree(tree);
+    insert(tree, ins, insertees);
+    // printtree(tree);
+    remove(tree, rem, insertees.length);
+    // printtree(tree);
+    // console.log('--END ITER--');
+    // if (!isBalanced(tree)) {
+    //   throw new Error('Tree is not balanced');
+    // }
+  }
+  console.timeEnd(ITERS);
+});
+
+// // ---------------------------
+// // Pushing and popping a lot of times
+// console.log(`Array: Inserting and removing in the middle ${ITERATIONS} times:`);
+// console.time('time');
+// for (let i = 0; i < ITERATIONS; ++i) {
+//   data.splice(Math.floor(Math.random() * INITIAL_SIZE), 0, i);
+//   data.splice(Math.floor(Math.random() * INITIAL_SIZE), 1);
+// }
+// console.timeEnd('time');
 
 // const BULK_SIZE = 10000;
 // const insertees: number[] = [];
