@@ -94,20 +94,27 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
     throw new Error('Index out of bounds');
   }
 
+  // After each node removal, we rebalance and start over again
+  // from the root. The `count` will be decremented, but the `start`
+  // index will remain the same. We *can* remove entire subtrees.
+  // however, due to how the balancing algo works, we can't remove
+  // multiple siblings / cousins and rebalance afterwards.
   while (count) {
     let node: BaseNode<T> = root;
     let tmpStart = start;
 
     while (node instanceof INode) {
       if (tmpStart === 0) {
-        // We have the oportunity to remove the entire node
+        // We have the oportunity to remove the entire node if count is bigger than it
         if (count >= node.getField(Size)) {
           if (node === root) {
+            // Special case, if we remove the entire tree, empty the root.
             while (node.size) {
               node.pop();
               return;
             }
           } else {
+            // Otherwise remove the entire node
             count -= node.getField(Size);
             const parent = node.parent;
             parent.pop(node.index);
@@ -116,8 +123,9 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
           }
         }
 
+        // When node's children are leaves start removing
+        // them instead of doing the inner loop again.
         if (node.a instanceof Leaf) {
-          // Just remove leaves
           while (count && node.size) {
             count -= 1;
             node.pop(0);
@@ -126,6 +134,8 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
           break;
         }
 
+        // Otherwise either enter the first child or
+        // remove it and start over
         if (count <= node.a.getField(Size)) {
           node = node.a;
           continue;
@@ -136,9 +146,10 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
           break;
         }
       } else {
+        // When node's children are leaves start removing
+        // them instead of doing the inner loop again.
+        // Also, tmpStart can be only 1 or 2 here.
         if (node.a instanceof Leaf) {
-          // Remove leaves.
-          // Also, tmpStart can be only 1 or 2
           while (count && node.size > 1) {
             count -= 1;
             node.pop(tmpStart as 1 | 2);
@@ -147,6 +158,7 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
           break;
         }
 
+        // Otherwise go to the start position
         if (node.a.getField(Size) > tmpStart) {
           node = node.a;
           continue;
@@ -159,121 +171,13 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
         } else {
           tmpStart -= node.b.getField(Size);
         }
-        // Now node.c, is necessarily present, and its size is > tmpStart
+
+        // Now `node.c` is necessarily present and its size is > tmpStart
         node = node.c;
         continue;
       }
     }
   }
-
-  //   if (start === 0) {
-  //     // When start is `0`, we have the opportunity to remove
-  //     // entire INodes at once, instead of going leaf by leaf
-  //     const length = node.getField(Size);
-  //     if (count >= length) {
-  //       if (node === root) {
-  //         // Special case when the entire tree is deleted, return an empty root.
-  //         while (node.size) {
-  //           node.pop();
-  //           return;
-  //         }
-  //       }
-  //       count -= length;
-  //       node.parent.pop(node.index);
-  //       node.parent.rebalance();
-  //     }
-
-  //   }
-
-  //   if (node.a.getField(Size) <= start) {
-  //     start -= node.a.getField(Size);
-  //   } else {
-  //     node = node.a;
-  //     continue;
-  //   }
-  // }
-
-  // while (root instanceof INode) {
-  //   if (root.a.getField(Size) <= index) {
-  //     index -= root.a.getField(Size);
-  //   } else {
-  //     root = root.a;
-  //     continue;
-  //   }
-
-  //   if (root.b.getField(Size) <= index) {
-  //     index -= root.b.getField(Size);
-  //   } else {
-  //     root = root.b;
-  //     continue;
-  //   }
-
-  //   root = root.c;
-  // }
-
-  // if (node instanceof INode) {
-  //   if (node.a.getField(Size) > start) {
-  //     // Get into node
-  //   }
-  //   start -= node.a.getField(Size);
-  //   if (node.b.getField(Size) > start) {
-  //     // Get into node
-  //   }
-  //   start -= node.b.getField(Size);
-  //   if (node.c.getField(Size) > start) {
-  //     // Get into node
-  //   }
-  //   start -= node.c.getField(Size);
-  // }
-
-  // // Nodes marked for rebalancing
-  // const marked: INode<T>[] = [];
-  // let lastMarked: INode<T> = null;
-  // node = atIndex(root, start);
-
-  // // This loop fixes the usage of `atIndex`, which always gives a leaf.
-  // // If that leaf happens to be the first child, and remove it and all
-  // // of its siblings, the parent will be left empty instead of removed.
-  // // Another fix (probably the right one) is to not use `atIndex`, but
-  // // traverse down starting from the root node. Whatever.
-  // if (node.index === 0) {
-  //   while (node.getField(Size) < count && node.index === 0) {
-  //     node = node.parent;
-  //   }
-  // }
-
-  // while (count > 0) {
-  //   if (count >= node.getField(Size)) {
-  //     let parent = node.parent;
-  //     const nix = node.index;
-
-  //     // If the node's size is smaller than the number of items
-  //     // to be removed, remove the entire node and move right.
-  //     parent.pop(nix);
-  //     count -= node.getField(Size);
-
-  //     if (lastMarked !== parent) {
-  //       marked.push(parent);
-  //       lastMarked = parent;
-  //     }
-
-  //     // Move to next sibling, or go up if no next sibling
-  //     node = parent.childAt(nix);
-  //     while (!node) {
-  //       if (!parent.parent) {
-  //         break;
-  //       }
-  //       node = parent.nextSibling;
-  //       parent = parent.parent;
-  //     }
-  //   } else {
-  //     // If the node's size is bigger than the number of items
-  //     // to be removed, traverse it.
-  //     node = (node as INode<T>).first;
-  //   }
-  // }
-
-  // marked.forEach(node => node.parent && node.rebalance());
 }
 
 /**
