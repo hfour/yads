@@ -261,7 +261,7 @@ export function insert<T>(root: INode<T>, index: number, insertees: T[]) {
 export function* iterate<T>(
   root: INode<T>,
   index: number = 0,
-  count: number = root.getField(Size) - 1,
+  count: number = root.getField(Size),
 ) {
   if (index < 0) {
     index = root.getField(Size) + index;
@@ -279,4 +279,10 @@ export function* iterate<T>(
     }
     count -= 1;
   } while (count > 0);
+}
+
+export function* iterateData<T>(root: INode<T>, index?: number, count?: number) {
+  for (let item of iterate(root, index, count)) {
+    yield item.data;
+  }
 }

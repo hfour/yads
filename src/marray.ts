@@ -9,7 +9,7 @@ export class MArray<T> {
   }
 
   push(...items: T[]) {
-    tu.insert(this.$data, this.$data.getField(tu.Size), items);
+    tu.insert(this.$data, this.length, items);
   }
 
   pop() {
@@ -65,5 +65,19 @@ export class MArray<T> {
 
   foldTo<Val>(index: number, monoid: ts.MonoidObj<Val, T>) {
     return tu.foldToIndex(this.$data, index, monoid);
+  }
+
+  get length() {
+    return this.$data.getField(tu.Size);
+  }
+
+  [Symbol.iterator]() {
+    return tu.iterateData(this.$data);
+  }
+
+  toArray() {
+    let res = [];
+    for (let item of this) res.push(item);
+    return res;
   }
 }
