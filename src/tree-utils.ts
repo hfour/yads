@@ -3,7 +3,7 @@ import { BaseNode, INode, Leaf, ChildIndex, MonoidObj } from './tree-structure';
 /**
  * The cache object used to track the number of leaf nodes in the tree.
  */
-export const Size: MonoidObj<number> = Object.freeze({
+export const Size: MonoidObj<number, any> = Object.freeze({
   identity: 0,
   operation: (a: number, b: number) => a + b,
   getCacheValue: () => 1,
@@ -79,6 +79,39 @@ export function atIndex<T>(root: BaseNode<T>, index: number) {
   }
 
   return root as Leaf<T>;
+}
+
+export function foldToIndex<T, U>(root: BaseNode<T>, index: number, monoid: MonoidObj<U, T>): U {
+  if (index < 0) {
+    index = root.getField(Size) + index;
+  }
+  if (index > root.getField(Size) - 1 || index < 0) {
+    throw new Error('Index out of bounds');
+  }
+
+  let folded = monoid.identity;
+
+  while (root instanceof INode) {
+    if (root.a.getField(Size) <= index) {
+      index -= root.a.getField(Size);
+      folded = monoid.operation(folded, root.a.getField(monoid));
+    } else {
+      root = root.a;
+      continue;
+    }
+
+    if (root.b.getField(Size) <= index) {
+      index -= root.b.getField(Size);
+      folded = monoid.operation(folded, root.b.getField(monoid));
+    } else {
+      root = root.b;
+      continue;
+    }
+
+    root = root.c;
+  }
+
+  return folded;
 }
 
 /**

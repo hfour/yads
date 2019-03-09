@@ -18,12 +18,6 @@
   },
   "jest": {
     "verbose": true,
-    "globals": {
-      "ts-jest": {
-        "tsConfigFile": "tsconfig.json",
-        "skipBabel": true
-      }
-    },
     "moduleFileExtensions": [
       "ts",
       "tsx",

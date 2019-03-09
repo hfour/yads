@@ -1,20 +1,20 @@
 import { computed, observable, action } from 'mobx';
 
-export type MonoidObj<T> = {
-  operation: (a: T, b: T) => T;
-  getCacheValue: (leaf: Leaf<any>) => T;
-  identity: T;
+export type MonoidObj<ValType, LeafType> = {
+  operation: (a: ValType, b: ValType) => ValType;
+  getCacheValue: (leaf: LeafType) => ValType;
+  identity: ValType;
 };
 
-export class MonoidalCache<T> {
-  constructor(private node: BaseNode<any>, private monoid: MonoidObj<T>) {}
+export class MonoidalCache<ValType, LeafType> {
+  constructor(private node: BaseNode<LeafType>, private monoid: MonoidObj<ValType, LeafType>) {}
 
   @computed
   get value() {
     if (this.node instanceof Leaf) {
-      return this.monoid.getCacheValue(this.node);
+      return this.monoid.getCacheValue(this.node.data);
     } else if (this.node instanceof INode) {
-      let result: T = this.monoid.identity;
+      let result: ValType = this.monoid.identity;
       for (let i = 0; i < 4; ++i) {
         const n = this.node.childAt(i as ChildIndex);
         if (n) {
@@ -38,7 +38,7 @@ export type ChildIndex = 0 | 1 | 2 | 3;
  * Base node class for the internal tree structure.
  */
 export class BaseNode<T> {
-  private monoidMap: WeakMap<MonoidObj<any>, MonoidalCache<any>> = new WeakMap();
+  private monoidMap: WeakMap<MonoidObj<any, any>, MonoidalCache<any, any>> = new WeakMap();
 
   parent: INode<T> = null;
 
@@ -50,7 +50,7 @@ export class BaseNode<T> {
   /**
    * Lazily cache and get cached value.
    */
-  getField<T>(monoid: MonoidObj<T>): T {
+  getField<MonVal>(monoid: MonoidObj<MonVal, T>): MonVal {
     let s = this.monoidMap.get(monoid);
     if (!s) {
       s = new MonoidalCache(this, monoid);
