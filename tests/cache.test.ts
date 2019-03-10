@@ -1,17 +1,24 @@
-import { fromArray, atIndex, insert, remove, MonoidObj } from '../src';
+import { fromArray, insert, remove, MonoidObj, foldToIndex } from '../src';
 
 describe('Internal computed cache structure', () => {
   const data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-  const Sum: MonoidObj<number> = {
+  const Sum: MonoidObj<number, number> = {
     identity: 0,
     operation: (a, b) => a + b,
     getCacheValue: () => 1,
   };
 
+  const SumVal: MonoidObj<number, number> = {
+    identity: 0,
+    operation: (a, b) => a + b,
+    getCacheValue: v => v,
+  };
+
   it('Cache works', () => {
     const tree = fromArray(data);
     expect(tree.getField(Sum)).toBe(11);
+    expect(foldToIndex(tree, 4, SumVal)).toBe(6);
   });
 
   it('Cache works with inserting nodes', () => {
