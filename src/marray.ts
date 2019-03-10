@@ -4,6 +4,12 @@ import * as tu from './tree-utils';
 export class MArray<T> {
   private $data: ts.INode<T>;
 
+  static from<T>(items: Iterable<T>) {
+    const arr = new MArray<T>();
+    arr.$data = tu.fromArray([...items]);
+    return arr;
+  }
+
   constructor(...items: T[]) {
     this.$data = tu.fromArray(items);
   }
