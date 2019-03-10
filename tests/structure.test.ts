@@ -1,5 +1,5 @@
 import { fromArray, INode, Leaf, atIndex, Size, remove, insert, iterate } from '../src';
-import { printtree, isBalanced } from './test.util';
+import { isBalanced } from './test.util';
 
 describe('Internal tree structure', () => {
   const data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
@@ -11,7 +11,6 @@ describe('Internal tree structure', () => {
     const tree = fromArray([1]);
     for (let i = 0; i < 16; ++i) {
       insert(tree, 0, [i]);
-      printtree(tree);
     }
     expect(1).toBe(1);
   });

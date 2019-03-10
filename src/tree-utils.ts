@@ -9,44 +9,34 @@ export const Size: MonoidObj<number, any> = Object.freeze({
   getCacheValue: () => 1,
 });
 
-/**
- * A not-so-efficient way to create a tree from arrays.
- * TODO: Optimize.
- */
-function distribute<T>(nodes: BaseNode<T>[]): INode<T> {
-  const len = nodes.length;
-
+export function fromArray<T>(data: T[], start = 0, len = data.length): INode<T> {
+  if (len === 2) {
+    return new INode(new Leaf(data[start]), new Leaf(data[start + 1]));
+  }
+  if (len === 3) {
+    return new INode(new Leaf(data[start]), new Leaf(data[start + 1]), new Leaf(data[start + 2]));
+  }
+  if (len === 1) {
+    return new INode(new Leaf(data[start]));
+  }
   if (len === 0) {
     return new INode();
   }
 
-  if (len === 1) {
-    if (nodes[0] instanceof INode) {
-      return nodes[0] as INode<T>;
-    } else {
-      return new INode(nodes[0]);
-    }
+  // Highest power of 2, lesser than len
+  const half = Math.pow(2, Math.floor(Math.log2(len)));
+  const quart = half / 2;
+  const rest = len - half;
+
+  if (rest >= quart) {
+    return new INode(
+      fromArray(data, start, quart),
+      fromArray(data, start + quart, quart),
+      fromArray(data, start + half, rest),
+    );
+  } else {
+    return new INode(fromArray(data, start, quart), fromArray(data, start + quart, quart + rest));
   }
-
-  const result: INode<T>[] = [];
-
-  for (let i = 0; i < len; i += 2) {
-    if (i + 3 === len) {
-      result.push(new INode(nodes[i], nodes[i + 1], nodes[i + 2]));
-      break;
-    } else if (i + 1 === len) {
-      result.push(new INode(nodes[i]));
-      break;
-    } else {
-      result.push(new INode(nodes[i], nodes[i + 1]));
-    }
-  }
-
-  return distribute(result);
-}
-
-export function fromArray<T>(data: T[]) {
-  return distribute(data.map(d => new Leaf(d)));
 }
 
 /**

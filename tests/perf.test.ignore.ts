@@ -1,6 +1,6 @@
 import { fromArray, atIndex, insert, remove, Size } from '../src';
 import { autorun, Lambda } from 'mobx';
-import { isBalanced, printtree } from './test.util';
+import { isBalanced } from './test.util';
 
 describe('Performance experiments', () => {
   const data: number[] = [];

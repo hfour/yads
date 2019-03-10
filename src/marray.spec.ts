@@ -6,6 +6,7 @@ let Total: MonoidObj<number, number> = {
   identity: 0,
   getCacheValue: a => a,
 };
+
 describe('array', () => {
   it('has basic functionality', () => {
     let a = new MArray(1, 2, 3);

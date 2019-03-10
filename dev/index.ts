@@ -1,6 +1,6 @@
-import 'babel-polyfill';
 import { autorun } from 'mobx';
-import { MArray } from '../src/marray';
+import { MArray } from '../src';
+// import { printtree } from './utils';
 
 const INITIAL_SIZE = 20000;
 const ITERATIONS = 1000;
@@ -39,5 +39,5 @@ console.log(`\nInserting/removing various number of elements in an array of ${ar
     array.splice(ins, 0, ...insertees);
     array.splice(rem, insertees.length);
   }
-  console.timeEnd(`${ITERATIONS} iterations`);
+  console.timeEnd(`${ITERATIONS} iterations with ${num} items`);
 });
