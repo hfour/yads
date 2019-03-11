@@ -9,7 +9,7 @@ export const Size: MonoidObj<number, any> = Object.freeze({
   getCacheValue: () => 1,
 });
 
-export function fromArray<T>(data: T[], start = 0, len = data.length): INode<T> {
+export const fromArray = <T>(data: T[], start = 0, len = data.length): INode<T> => {
   if (len === 2) {
     return new INode(new Leaf(data[start]), new Leaf(data[start + 1]));
   }
@@ -37,7 +37,7 @@ export function fromArray<T>(data: T[], start = 0, len = data.length): INode<T> 
   } else {
     return new INode(fromArray(data, start, quart), fromArray(data, start + quart, quart + rest));
   }
-}
+};
 
 /**
  * Returns the leaf node at `index`.

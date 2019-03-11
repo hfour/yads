@@ -32,8 +32,8 @@ const evenCount = myArray.getValue(EvenCount); // Much much faster than running 
 
 ## How to use it
 
-**Note:** This repo is still a work in progress. It does not expose a true array API to the data
-structure yet, so you will need to use helper functions.
+**Note:** This repo is still a work in progress. There's now an array interface which needs to be
+documented.
 
 First, we need a way to describe what we're caching. We do this by defining a monoid. A monoid is a
 simple structure that defines an _identity value_ and an _associative operation_.
@@ -58,8 +58,8 @@ order defined between any child nodes. Consider the following example:
 ```
 
 Since there is a partial fold `pf` defined on `a` and `b`, we require associativity so that
-`pf(a) o pf(b) = pf(R)` for any operation `o`. This will not be fulfilled e.g. for the operation
-`-` since we will have that `pf(a) = e1 - e2` and `pf(b) = e3 - e4`, but
+`pf(a) o pf(b) = pf(R)` for any operation `o`. This will not be fulfilled e.g. for the operation `-`
+since we will have that `pf(a) = e1 - e2` and `pf(b) = e3 - e4`, but
 `pf(a) - pf(b) = e1 - e2 - e3 + e4`, which is different from `pf(R) = e1 - e2 - e3 - e4`.
 
 We also need a way to express how the cache values are extracted from a single element in the array.
@@ -68,7 +68,7 @@ We do this by defining a function property on the monoid called `getCacheValue`.
 So, here's how we define a cache for our array:
 
 ```typescript
-import { MonoidObj, fromArray, insert } from 'yads'
+import { MonoidObj, fromArray, insert } from 'yads';
 
 /**
  * EvenCount is a number value. It tells us how many values in the array are even.
@@ -81,7 +81,7 @@ const EvenCount: MonoidObj<number> = Object.freeze({
   // Addition's identity is 0
   identity: 0,
   // Cache value is 1 if data val is even
-  getCacheValue: (leaf) => leaf.data.value % 2 === 0 ? 1 : 0
+  getCacheValue: leaf => (leaf.data.value % 2 === 0 ? 1 : 0),
 });
 
 const myYadsArray = fromArray(myArray);
@@ -229,9 +229,3 @@ You will need yarn (https://yarnpkg.com/en/) and parcel (https://parceljs.org/).
 3. You can run `yarn browser` to start a development server with `parcel`, then visit
    "http://localhost:1234" to play around with it in the browser. Check out the `dev` folder for the
    browser code.
-
-## Known bugs
-
-1. The `remove` helper method can leave the tree in an unbalanced state which throws an error. This
-   example is illustrated in the `dev` folder when you run it in the browser (open the console, see
-   the error - there's an iNode with no children that doesn't get removed).
