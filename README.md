@@ -110,7 +110,7 @@ We do this by defining a function property on the monoid called `getCacheValue`.
 One cool thing about this data structure is that you can lazily define caches, by passing the monoid
 each time you do cache lookups. If the cache is cold, the `getCacheValue` function is used to
 construct it. A warm cache will be reused as much as possible. Adding a new element to the array
-will trigger a single run of `getCacheValue` for the new element, and at most Log2(N) runs of the
+will trigger a single run of `getCacheValue` for the new element, and `O(log(N))` runs of the
 `operation` function.
 
 ## Internals
