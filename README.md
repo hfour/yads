@@ -210,15 +210,14 @@ Here's an example of how the tree changes when we keep adding leaf nodes.
   e   e  e   e  e   e  e   e  e   e  e
 ```
 
-Random access is a Log2(N) operation. We leverage the cache system to keep track of how many leaf
+Random access is a `log(N)` operation. We leverage the cache system to keep track of how many leaf
 nodes (elements) there are under each iNode and there's a predefined `Size` monoid that you can use
 to query the array's `length` property "indirectly"
 
 ```typescript
 import { Size } from 'yads';
 
-// Don't forget, we pushed 2 elements in the other example
-const length = myYadsArray.reduceAll(Size); // Returns 6
+const length = myYadsArray.reduceAll(Size); // Returns myYadsArray.length
 ```
 
 ## Dependencies
