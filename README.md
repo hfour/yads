@@ -94,9 +94,8 @@ order defined between any child nodes. Consider the following example:
       R___
      /    \
     a      b
-
-/ \ / \
- e1 e2 e3 e4
+   / \    / \
+ e1  e2  e3 e4
 
 ```
 
