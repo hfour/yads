@@ -35,7 +35,7 @@ Instead of just the reduce function, you will need 3 pieces of information
 By giving these items, `yads` will effectively compute:
 
 ```typescript
-array.reduce((acc, el) => acc + getCacheValue(el), identity);
+array.reduce((acc, el) => operation(acc, getCacheValue(el)), identity);
 ```
 
 Lets see how we can write the code to do this:
