@@ -20,19 +20,8 @@
   },
   "jest": {
     "verbose": true,
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
+    "preset": "ts-jest",
     "testRegex": "(/tests/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/tests/fileMock.json",
-      "\\.(css|scss)$": "<rootDir>/tests/styleMock.json"
-    },
     "testPathIgnorePatterns": [
       "/node_modules/",
       "\\.util\\.ts$",

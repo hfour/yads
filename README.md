@@ -2,41 +2,81 @@
 
 So what is it?
 
-It's an array-like data structure that caches derived data about its elements in an efficient way.
+Its an array-like data structure that caches derived data about its elements using MobX
 
-Suppose you have an array of elements that look like this:
+Imagine an array that can re-compute the following reduce call:
 
 ```typescript
-type Element = {
-  value: number;
+array.reduce((acc, el) => acc + el);
+```
+
+in `O(log(n))` instead of `O(n)` any time you change or add an element in the array.
+
+For an array of length 1024, that would be `7` steps instead of `1024`.
+
+Now imagine that you can also get a partial reduce (fold):
+
+```typescript
+array.reduceTo(elementIndex, (acc, el) => acc + el);
+```
+
+in the same `O(log(n))` time. Magic!
+
+## How to use it?
+
+For yads to work, the reduce operation has to be defined in a slightly more complex way.
+
+Instead of just the reduce function, you will need 3 pieces of information
+
+- **identity** - the initial value (like the one you would pass to `array.reduce(fn, initialValue)`)
+- **operation** - the function to apply for any two elements
+- **getCacheValue** - the function to apply to every leaf element
+
+By giving these items, `yads` will effectively compute:
+
+```typescript
+array.reduce((acc, el) => acc + getCacheValue(el), identity);
+```
+
+Lets see how we can write the code to do this:
+
+```typescript
+import { MArray, MonoidObj } from 'yads';
+
+let Total: MonoidObj<number, number> = {
+  operation: (a: number, b: number) => a + b,
+  identity: 0,
+  getCacheValue: a => a,
 };
 
-const myArray: Element[] = [{ value: 1 }, { value: 2 }, { value: 5 }, { value: 6 }];
+let a = new MArray([5, 10, 2, 3, 11]);
+
+expect(a.reduceTo(2, Total)).toEqual(17); // reduces to the 3rd element
 ```
 
-You want to know how many of the elements in your array have an even value. You have to calculate
-it, maybe using a reduce:
+## What can you use this for?
 
-```typescript
-const evenCount = myArray.reduce((count, el) => count + (el.value % 2 === 0 ? 1 : 0), 0);
-```
+One example would be a custom calculated layout:
 
-If your array is large and gets mutated often, this becomes inefficient, so you must devise some
-caching mechanism. This data structure makes caching fast and easy for very large arrays whose
-operations on elements are associative. You could do something like this:
+- The height of each element in a list affects the top offset of all the other elements.
+- Updating one element's height will cause updates for the top offsets of the subsequent elements
+- If you are rendering only k visible elements, this will cost `O(log(n) + k)` with yads regardless
+  of which element got updated; it will cost `O(n + k)` for a regular array
 
-```typescript
-import { EvenCount } from './someplace';
-const evenCount = myArray.getValue(EvenCount); // Much much faster than running reduce.
-```
+Another example are live search results for a huge list of items
 
-## How to use it
+- The associative operation can construct a mirrored search results tree { leftResults: L,
+  rightResults: R}
+- An `@observer` react component can render results of this tree (either direct results from a leaf
+  or a tree of recursive results)
+- Updating any of the individual items content will only trigger `O(1)` re-renders of the search
+  results (only the leaf items will update)
 
-**Note:** This repo is still a work in progress. There's now an array interface which needs to be
-documented.
+TODO: more examples
 
-First, we need a way to describe what we're caching. We do this by defining a monoid. A monoid is a
-simple structure that defines an _identity value_ and an _associative operation_.
+## Theory
+
+A monoid is a simple structure that defines an _identity value_ and an _associative operation_.
 
 An associative operation is a binary operation (has 2 operands) that gives the same result, no
 matter how the operands are grouped. For example, addition and multiplication are associative
@@ -46,15 +86,18 @@ The identity value is a special value for an associative operation. When the ope
 on any value (A) with the identity value (I), the result is always (A). For addition, the identity
 value is `0`, and for multiplication it's `1`. For example: `5 + 0 = 5` and `1 * 6 = 6`.
 
-The current design is dependent on associativity since we're folding form the left and there is no
+The current design is dependent on associativity since we're reducing form the left and there is no
 order defined between any child nodes. Consider the following example:
 
 ```
+
       R___
      /    \
     a      b
-   / \    / \
-  e1  e2 e3  e4
+
+/ \ / \
+ e1 e2 e3 e4
+
 ```
 
 Since there is a partial fold `pf` defined on `a` and `b`, we require associativity so that
@@ -65,41 +108,11 @@ since we will have that `pf(a) = e1 - e2` and `pf(b) = e3 - e4`, but
 We also need a way to express how the cache values are extracted from a single element in the array.
 We do this by defining a function property on the monoid called `getCacheValue`.
 
-So, here's how we define a cache for our array:
-
-```typescript
-import { MonoidObj, fromArray, insert } from 'yads';
-
-/**
- * EvenCount is a number value. It tells us how many values in the array are even.
- * The associative operation is simple arithmetic addition.
- * The cached value for a single element is `1` if the element value is even, otherwise `0`.
- */
-const EvenCount: MonoidObj<number> = Object.freeze({
-  // It's the same operation as the reduce in the above example
-  operation: (a, b) => a + b,
-  // Addition's identity is 0
-  identity: 0,
-  // Cache value is 1 if data val is even
-  getCacheValue: leaf => (leaf.data.value % 2 === 0 ? 1 : 0),
-});
-
-const myYadsArray = fromArray(myArray);
-myYadsArray.getField(EvenCount); // Returns 2 (2 and 6 are even elements)
-
-insert(myYadsArray, 2, [{ value: 7 }, { value: 8 }]);
-myYadsArray.getField(EvenCount); // Returns 3 (2, 6 and 8 are even elements)
-```
-
 One cool thing about this data structure is that you can lazily define caches, by passing the monoid
 each time you do cache lookups. If the cache is cold, the `getCacheValue` function is used to
 construct it. A warm cache will be reused as much as possible. Adding a new element to the array
 will trigger a single run of `getCacheValue` for the new element, and at most Log2(N) runs of the
 `operation` function.
-
-Notice that `getCacheValue` accepts something called `leaf`, and you access the data with
-`leaf.data.value` instead of `leaf.value`. This exposes the internals of the implementation, which
-we talk about next.
 
 ## Internals
 
@@ -200,13 +213,13 @@ Here's an example of how the tree changes when we keep adding leaf nodes.
 
 Random access is a Log2(N) operation. We leverage the cache system to keep track of how many leaf
 nodes (elements) there are under each iNode and there's a predefined `Size` monoid that you can use
-to query the array's `length` property:
+to query the array's `length` property "indirectly"
 
 ```typescript
 import { Size } from 'yads';
 
 // Don't forget, we pushed 2 elements in the other example
-const length = myYadsArray.getField(Size); // Returns 6
+const length = myYadsArray.reduceAll(Size); // Returns 6
 ```
 
 ## Dependencies

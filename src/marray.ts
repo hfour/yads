@@ -70,7 +70,15 @@ export class MArray<T> {
   }
 
   foldTo<Val>(index: number, monoid: ts.MonoidObj<Val, T>) {
-    return tu.foldToIndex(this.$data, index, monoid);
+    return tu.foldToIndex(this.$data, index + 1, monoid);
+  }
+
+  reduceTo<Val>(index: number, monoid: ts.MonoidObj<Val, T>) {
+    return tu.foldToIndex(this.$data, index + 1, monoid);
+  }
+
+  reduceAll<Val>(monoid: ts.MonoidObj<Val, T>) {
+    return this.$data.getField(monoid);
   }
 
   get length() {

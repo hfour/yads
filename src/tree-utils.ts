@@ -75,7 +75,7 @@ export function foldToIndex<T, U>(root: BaseNode<T>, index: number, monoid: Mono
   if (index < 0) {
     index = root.getField(Size) + index;
   }
-  if (index > root.getField(Size) - 1 || index < 0) {
+  if (index > root.getField(Size) || index < 0) {
     throw new Error('Index out of bounds');
   }
 

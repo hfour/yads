@@ -22,6 +22,6 @@ describe('array', () => {
     a.unshift(5);
     a.push(11);
     expect(a.toArray()).toEqual([5, 10, 2, 3, 11]);
-    expect(a.foldTo(3, Total)).toEqual(17);
+    expect(a.reduceTo(2, Total)).toEqual(17);
   });
 });

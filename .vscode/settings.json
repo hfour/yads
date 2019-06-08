@@ -11,5 +11,8 @@
     "**/bower_components": true,
     "coverage/**": true,
     "build/**": true
-  }
+  },
+  "cSpell.words": [
+    "yads"
+  ]
 }
