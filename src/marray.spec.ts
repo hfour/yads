@@ -1,10 +1,9 @@
 import { MArray } from './marray';
-import { MonoidObj } from './tree-structure';
 
-let Total: MonoidObj<number, number> = {
+let Total = {
   operation: (a: number, b: number) => a + b,
   identity: 0,
-  getCacheValue: a => a,
+  getCacheValue: (a: number) => a,
 };
 
 describe('array', () => {

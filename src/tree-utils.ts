@@ -72,27 +72,36 @@ export function atIndex<T>(root: BaseNode<T>, index: number) {
 }
 
 export function foldToIndex<T, U>(root: BaseNode<T>, index: number, monoid: MonoidObj<U, T>): U {
-  if (index < 0) {
-    index = root.getField(Size) + index;
-  }
   if (index > root.getField(Size) || index < 0) {
     throw new Error('Index out of bounds');
   }
 
-  let folded = monoid.identity;
+  return foldToFindValue(root, Size, sz => sz <= index, monoid);
+}
+
+export function foldToFindValue<NodeContent, ConditionValue, SumValue>(
+  root: BaseNode<NodeContent>,
+  criteriaMonoid: MonoidObj<ConditionValue, NodeContent>,
+  takeWhile: (c: ConditionValue) => boolean, // example:
+  sumMonoid: MonoidObj<SumValue, NodeContent>,
+): SumValue {
+  let sumValue = sumMonoid.identity;
+  let criteriaValue = criteriaMonoid.identity;
 
   while (root instanceof INode) {
-    if (root.a.getField(Size) <= index) {
-      index -= root.a.getField(Size);
-      folded = monoid.operation(folded, root.a.getField(monoid));
+    let res = criteriaMonoid.operation(criteriaValue, root.a.getField(criteriaMonoid));
+    if (takeWhile(res)) {
+      criteriaValue = res;
+      sumValue = sumMonoid.operation(sumValue, root.a.getField(sumMonoid));
     } else {
       root = root.a;
       continue;
     }
 
-    if (root.b.getField(Size) <= index) {
-      index -= root.b.getField(Size);
-      folded = monoid.operation(folded, root.b.getField(monoid));
+    let res2 = criteriaMonoid.operation(criteriaValue, root.b.getField(criteriaMonoid));
+    if (takeWhile(res2)) {
+      criteriaValue = res2;
+      sumValue = sumMonoid.operation(sumValue, root.b.getField(sumMonoid));
     } else {
       root = root.b;
       continue;
@@ -101,7 +110,15 @@ export function foldToIndex<T, U>(root: BaseNode<T>, index: number, monoid: Mono
     root = root.c;
   }
 
-  return folded;
+  return sumValue;
+}
+
+export function findIndex<NodeContent, ConditionValue>(
+  root: BaseNode<NodeContent>,
+  criteriaMonoid: MonoidObj<ConditionValue, NodeContent>,
+  takeWhile: (c: ConditionValue) => boolean, // example:
+): number {
+  return foldToFindValue(root, criteriaMonoid, takeWhile, Size);
 }
 
 /**
