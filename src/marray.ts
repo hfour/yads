@@ -94,4 +94,8 @@ export class MArray<T> {
     for (let item of this) res.push(item);
     return res;
   }
+
+  slice(start: number = 0, end: number = this.length) {
+    return Array.from(tu.iterateData(this.$data, start, end - start));
+  }
 }

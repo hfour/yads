@@ -5,6 +5,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "asciitree": "^1.0.2",
+    "iterall": "^1.3.0",
     "jest": "^24.3.1",
     "parcel-bundler": "^1.12.0",
     "prettier": "^1.16.4",
