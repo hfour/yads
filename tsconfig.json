@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "preserveWatchOutput": true,
+    "outDir": "./build",
+    "sourceMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "baseUrl": "./",
+    "target": "es2015",
+    "allowJs": false,
+    "allowSyntheticDefaultImports": false,
+    "skipLibCheck": true,
+    "typeRoots": ["./node_modules/@types", "./@types"],
+    "plugins": [],
+    "esModuleInterop": true
+  },
+  "exclude": ["build", "node_modules", ".git", ".cache", ".vscode"]
+}
