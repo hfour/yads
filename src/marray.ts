@@ -1,8 +1,11 @@
 import * as ts from './tree-structure';
 import * as tu from './tree-utils';
 
-let isNumber = (thing: number | string): thing is number => {
-  return !isNaN(Number.parseInt(thing.toString()));
+let isNumber = (s: any): s is number => {
+  if (s === '' || typeof s === 'symbol') return false;
+  let n = Number(s);
+  if (Number.isInteger(n)) return true;
+  return false;
 };
 
 export class MArray<T> {
@@ -19,12 +22,12 @@ export class MArray<T> {
     this.$data = tu.fromArray(items);
 
     return new Proxy(this, {
-      get: (target, prop: string, receiver) => {
+      get: (target, prop, receiver) => {
         if (isNumber(prop)) {
           return this.at(prop);
         } else return Reflect.get(target, prop, receiver);
       },
-      set: (target, prop: string, value, receiver): boolean => {
+      set: (target, prop, value, receiver): boolean => {
         if (isNumber(prop)) {
           this.update(prop, value);
           return true;

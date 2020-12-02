@@ -10,6 +10,7 @@ describe('array', () => {
   it('has basic functionality', () => {
     let a = new MArray(1, 2, 3);
     expect(a[1]).toEqual(2);
+    expect(a[1.1]).toEqual(undefined);
     a.push(5);
     let r = a.pop();
     expect(r).toEqual(5);
