@@ -1,12 +1,12 @@
 import * as ts from './tree-structure';
 import * as tu from './tree-utils';
 
-let isNumber = (s: any): s is number => {
-  if (s === '' || typeof s === 'symbol') return false;
+function toInteger(s: any): number | null {
+  if (s === '' || typeof s === 'symbol') return null;
   let n = Number(s);
-  if (Number.isInteger(n)) return true;
-  return false;
-};
+  if (Number.isInteger(n)) return n;
+  return null;
+}
 
 export class MArray<T> {
   [n: number]: T;
@@ -23,15 +23,19 @@ export class MArray<T> {
 
     return new Proxy(this, {
       get: (target, prop, receiver) => {
-        if (isNumber(prop)) {
-          return this.at(prop);
-        } else return Reflect.get(target, prop, receiver);
+        let maybeInteger = toInteger(prop);
+        if (maybeInteger === null) {
+          return Reflect.get(target, prop, receiver);
+        } else return this.at(maybeInteger);
       },
       set: (target, prop, value, receiver): boolean => {
-        if (isNumber(prop)) {
-          this.update(prop, value);
+        let maybeInteger = toInteger(prop);
+        if (maybeInteger === null) {
+          return Reflect.set(target, prop, value, receiver);
+        } else {
+          this.update(maybeInteger, value);
           return true;
-        } else return Reflect.set(target, prop, value, receiver);
+        }
       },
     });
   }

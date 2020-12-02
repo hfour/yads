@@ -43,9 +43,6 @@ export const fromArray = <T>(data: T[], start = 0, len = data.length): INode<T> 
  * Returns the leaf node at `index`.
  */
 export function atIndex<T>(root: BaseNode<T>, index: number) {
-  if (index < 0) {
-    index = root.getField(Size) + index;
-  }
   if (index > root.getField(Size) - 1 || index < 0) {
     throw new Error('Index out of bounds');
   }

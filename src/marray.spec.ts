@@ -11,6 +11,8 @@ describe('array', () => {
     let a = new MArray(1, 2, 3);
     expect(a[1]).toEqual(2);
     expect(a[1.1]).toEqual(undefined);
+    expect(() => a[-1]).toThrow();
+    expect(() => a[3]).toThrow();
     a.push(5);
     let r = a.pop();
     expect(r).toEqual(5);
