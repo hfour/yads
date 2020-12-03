@@ -1,7 +1,15 @@
 import * as ts from './tree-structure';
 import * as tu from './tree-utils';
 
+function toInteger(s: any): number | null {
+  if (s === '' || typeof s === 'symbol') return null;
+  let n = Number(s);
+  if (Number.isInteger(n)) return n;
+  return null;
+}
+
 export class MArray<T> {
+  [n: number]: T;
   private $data: ts.INode<T>;
 
   static from<T>(items: Iterable<T>) {
@@ -12,6 +20,24 @@ export class MArray<T> {
 
   constructor(...items: T[]) {
     this.$data = tu.fromArray(items);
+
+    return new Proxy(this, {
+      get: (target, prop, receiver) => {
+        let maybeInteger = toInteger(prop);
+        if (maybeInteger === null) {
+          return Reflect.get(target, prop, receiver);
+        } else return this.at(maybeInteger);
+      },
+      set: (target, prop, value, receiver): boolean => {
+        let maybeInteger = toInteger(prop);
+        if (maybeInteger === null) {
+          return Reflect.set(target, prop, value, receiver);
+        } else {
+          this.update(maybeInteger, value);
+          return true;
+        }
+      },
+    });
   }
 
   push(...items: T[]) {

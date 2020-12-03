@@ -9,6 +9,10 @@ let Total = {
 describe('array', () => {
   it('has basic functionality', () => {
     let a = new MArray(1, 2, 3);
+    expect(a[1]).toEqual(2);
+    expect(a[1.1]).toEqual(undefined);
+    expect(() => a[-1]).toThrow();
+    expect(() => a[3]).toThrow();
     a.push(5);
     let r = a.pop();
     expect(r).toEqual(5);
@@ -21,7 +25,8 @@ describe('array', () => {
     a.unshift(5);
     a.push(11);
     expect(a.toArray()).toEqual([5, 10, 2, 3, 11]);
-    expect(a.reduceTo(2, Total)).toEqual(17);
+    a[2] = 4;
+    expect(a.reduceTo(2, Total)).toEqual(19);
   });
 });
 

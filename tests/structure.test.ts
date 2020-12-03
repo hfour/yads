@@ -47,11 +47,7 @@ describe('Internal tree structure', () => {
     expect(atIndex(tree, 7).data).toBe(7);
     expect(atIndex(tree, 10).data).toBe(10);
     expect(atIndex(tree, 14).data).toBe(14);
-    expect(atIndex(tree, -15).data).toBe(0);
-    expect(atIndex(tree, -12).data).toBe(3);
-    expect(atIndex(tree, -8).data).toBe(7);
-    expect(atIndex(tree, -5).data).toBe(10);
-    expect(atIndex(tree, -1).data).toBe(14);
+    expect(() => atIndex(tree, -1).data).toThrowError();
   });
 
   it('Can insert nodes in the middle', () => {
