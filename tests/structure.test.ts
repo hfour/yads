@@ -16,8 +16,8 @@ describe('Internal tree structure', () => {
   });
 
   it('Creates a tree', () => {
-    const data: number[] = [0];
-    for (let i = 1; i < 11; ++i) {
+    const data: number[] = [];
+    for (let i = 0; i < 11; ++i) {
       const tree = fromArray(data);
       expect(isBalanced(tree)).toBeTruthy();
       expect(tree.getField(Size)).toEqual(i);
