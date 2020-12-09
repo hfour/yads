@@ -28,6 +28,32 @@ describe('array', () => {
     a[2] = 4;
     expect(a.reduceTo(2, Total)).toEqual(19);
   });
+
+  describe('MArray.concat test suite', () => {
+    it('should not mutate original array when concating', () => {
+      const a = new MArray(1, 2, 3);
+
+      a.concat(4);
+
+      expect(a.toArray()).toEqual([1, 2, 3]);
+    });
+
+    it('should return same array when concat with no arguments ', () => {
+      const a = new MArray(1, 2, 3);
+
+      const result = a.concat();
+
+      expect(result.toArray()).toEqual([1, 2, 3]);
+    });
+
+    it('should concat with arguments of multiple types', () => {
+      const a = new MArray(1, 2, 3);
+
+      const result = a.concat(4, [5, 6], new MArray(7, 8));
+
+      expect(result.toArray()).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    });
+  });
 });
 
 type Node = { type: 'h1' | 'h2' | 'h3' | 'p'; text: string };
