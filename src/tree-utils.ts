@@ -267,6 +267,9 @@ export function* iterate<T>(
   index: number = 0,
   count: number = root.getField(Size),
 ) {
+  if (root.getField(Size) === 0) {
+    return;
+  }
   if (index < 0) {
     index = root.getField(Size) + index;
   }

@@ -84,6 +84,26 @@ export class MArray<T> {
   }
 
   /**
+   * Combines two or more arrays.
+   * @param items Additional items to add to the end of array.
+   */
+  concat(...items: (T | ConcatArray<T> | MArray<T>)[]): MArray<T> {
+    const resultArray = this.toArray();
+
+    for (const item of items) {
+      if (Array.isArray(item)) {
+        resultArray.push(...item);
+      } else if (item instanceof MArray) {
+        resultArray.push(...item);
+      } else {
+        resultArray.push(item as T);
+      }
+    }
+
+    return MArray.from(resultArray);
+  }
+
+  /**
    * Get element at the given index
    * @param index the index to search for
    */
