@@ -1,4 +1,14 @@
-import { fromArray, INode, Leaf, atIndex, Size, remove, insert, iterate } from '../src';
+import {
+  fromArray,
+  INode,
+  Leaf,
+  atIndex,
+  Size,
+  remove,
+  insert,
+  iterate,
+  iterateData,
+} from '../src';
 import { isBalanced } from './test.util';
 
 describe('Internal tree structure', () => {
@@ -243,5 +253,61 @@ describe('Internal tree structure', () => {
       result.push(node.data);
     }
     expect(result).toEqual([5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  it('Correctly iterates over the specified number of nodes', () => {
+    const tree = fromArray(data);
+    const result: number[] = [];
+    const count = 5;
+
+    for (let node of iterate(tree, 0, count)) {
+      result.push(node.data);
+    }
+    expect(result.length).toEqual(count);
+  });
+
+  it('Correctly iterates over nodes starting from the specified index', () => {
+    const tree = fromArray(data);
+    const result: number[] = [];
+    const index = 2;
+
+    for (let node of iterate(tree, 2)) {
+      result.push(node.data);
+    }
+    expect(result[0]).toEqual(atIndex(tree, index).data);
+  });
+
+  it('Correctly iterates over an empty tree', () => {
+    const tree = fromArray([]);
+    const result: any[] = [];
+
+    for (let node of iterate(tree, data.length)) {
+      result.push(node);
+    }
+    expect(result.length).toBe(0);
+  });
+
+  it('Correctly iterates data over all nodes', () => {
+    const tree = fromArray(data);
+    const result: number[] = [];
+
+    for (let node of iterateData(tree)) {
+      result.push(node);
+    }
+    expect(result).toEqual(data);
+  });
+
+  it('Ensures iteration through node data behaves similarly to regular arrays', () => {
+    const tree = fromArray(data);
+    const result_iterate_data: number[] = [];
+    const result_for_loop: number[] = [];
+
+    for (let node of iterateData(tree)) {
+      result_iterate_data.push(node);
+    }
+    for (let i of data) {
+      result_for_loop.push(i);
+    }
+    expect(result_iterate_data).toEqual(result_for_loop);
   });
 });
