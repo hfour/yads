@@ -102,6 +102,38 @@ describe('array', () => {
       expect(resOverLowerBound).toEqual(-1);
     });
   });
+
+  describe('MArray iteration test suite', () => {
+    it('should be iterable by a for...of loop', () => {
+      const mArray = new MArray(1, 2, 3, 4, 5);
+      let result: number[] = [];
+
+      for (let x of mArray) result.push(x);
+
+      expect(result).toEqual([1, 2, 3, 4, 5]);
+    });
+
+    it('should not return anything when iterating through an empty MArray', () => {
+      const mArray = new MArray();
+      let result: any[] = [];
+
+      for (let x of mArray) result.push(x);
+
+      expect(result).toEqual([]);
+    });
+
+    it('should behave in a same way as a regular array when being iterated with a for...of loop', () => {
+      const regArray = [2, 4, 6, 8, 10];
+      const mArray = new MArray(...regArray);
+      let result1: number[] = [];
+      let result2: number[] = [];
+
+      for (let x of mArray) result1.push(x);
+      for (let y of regArray) result2.push(y);
+
+      expect(result1).toEqual(result2);
+    });
+  });
 });
 
 type Node = { type: 'h1' | 'h2' | 'h3' | 'p'; text: string };
