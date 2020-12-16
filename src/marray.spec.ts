@@ -54,6 +54,54 @@ describe('array', () => {
       expect(result.toArray()).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     });
   });
+
+  describe('Finding stuff in MArray', () => {
+    it('Finds a thing, [.find(f)]', () => {
+      let a = new MArray('xy', 'yz', 'zx', 'rgb', 'gb', 'ba');
+
+      let res = a.find(x => x.length > 2);
+      let noRes = a.find(x => x == undefined);
+
+      expect(res).toEqual('rgb');
+      expect(noRes).toBeUndefined();
+    });
+
+    it('Finds a thing with "this", [.find(f, t)]', () => {
+      let a = new MArray('xy', 'yz', 'zx', 'rgb', 'gb', 'ba');
+
+      function finder(this: any, x: any): boolean {
+        return this.toFind === x;
+      }
+
+      let res = a.find(finder, { toFind: 'rgb' });
+      let noRes = a.find(finder, { toFind: 'ghost' });
+
+      expect(res).toEqual('rgb');
+      expect(noRes).toBeUndefined();
+    });
+
+    it('Finds index of a thing, [.indexOf(x[, i])', () => {
+      let a = new MArray('xy', 'yz', 'zx', 'rgb', 'gb', 'ba');
+
+      let res = a.indexOf('rgb');
+      let resNot = a.indexOf('ghost');
+      let resFromIndex = a.indexOf('rgb', 4);
+      let resFromNegativeIndex = a.indexOf('rgb', -4);
+      let resUpperBound = a.indexOf('ba', 5);
+      let resOverUpperBound = a.indexOf('ba', 6);
+      let resLowerBound = a.indexOf('xy', -6);
+      let resOverLowerBound = a.indexOf('ba', -7);
+
+      expect(res).toEqual(3);
+      expect(resNot).toEqual(-1);
+      expect(resFromIndex).toEqual(-1);
+      expect(resFromNegativeIndex).toEqual(3);
+      expect(resUpperBound).toEqual(5);
+      expect(resOverUpperBound).toEqual(-1);
+      expect(resLowerBound).toEqual(0);
+      expect(resOverLowerBound).toEqual(-1);
+    });
+  });
 });
 
 type Node = { type: 'h1' | 'h2' | 'h3' | 'p'; text: string };
