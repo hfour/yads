@@ -131,11 +131,10 @@ export class MArray<T> {
     predicate: (item: T, index?: number, mArray?: MArray<T>) => boolean,
     thisArg?: any,
   ): T | undefined {
-    let thisArray = Object(this);
     let index = 0;
 
     for (let item of this) {
-      let found = predicate.call(thisArg, item, index, thisArray);
+      let found = predicate.call(thisArg, item, index, this);
       if (found) return item;
       index++;
     }

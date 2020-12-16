@@ -56,7 +56,7 @@ describe('array', () => {
   });
 
   describe('Finding stuff in MArray', () => {
-    it('Finds a thing, [.find(f)]', () => {
+    it('Finds a thing, [ .find(f) ]', () => {
       let a = new MArray('xy', 'yz', 'zx', 'rgb', 'gb', 'ba');
 
       let res = a.find(x => x.length > 2);
@@ -66,7 +66,7 @@ describe('array', () => {
       expect(noRes).toBeUndefined();
     });
 
-    it('Finds a thing with "this", [.find(f, t)]', () => {
+    it('Finds a thing with "this", [ .find(f, t) ]', () => {
       let a = new MArray('xy', 'yz', 'zx', 'rgb', 'gb', 'ba');
 
       function finder(this: any, x: any): boolean {
@@ -80,7 +80,7 @@ describe('array', () => {
       expect(noRes).toBeUndefined();
     });
 
-    it('Finds index of a thing, [.indexOf(x[, i])', () => {
+    it('Finds index of a thing, [ .indexOf(x[, i]) ]', () => {
       let a = new MArray('xy', 'yz', 'zx', 'rgb', 'gb', 'ba');
 
       let res = a.indexOf('rgb');
