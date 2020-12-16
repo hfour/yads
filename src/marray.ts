@@ -127,6 +127,37 @@ export class MArray<T> {
     return this.$data.getField(monoid);
   }
 
+  find(
+    predicate: (item: T, index?: number, mArray?: MArray<T>) => boolean,
+    thisArg?: any,
+  ): T | undefined {
+    let index = 0;
+
+    for (let item of this) {
+      let found = predicate.call(thisArg, item, index, this);
+      if (found) return item;
+      index++;
+    }
+    return undefined;
+  }
+
+  indexOf(itemToFind: T, fromIndex?: number): number {
+    if (fromIndex === undefined) {
+      fromIndex = 0;
+    } else if (fromIndex < 0 && fromIndex >= -this.length) {
+      fromIndex = this.length + fromIndex;
+    } else if (fromIndex < -this.length || fromIndex >= this.length) {
+      return -1;
+    }
+
+    for (let index = fromIndex; index < this.length; index++) {
+      let item = this[index];
+      let found = item === itemToFind;
+      if (found) return index;
+    }
+    return -1;
+  }
+
   get length() {
     return this.$data.getField(tu.Size);
   }
