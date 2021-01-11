@@ -104,6 +104,44 @@ export class MArray<T> {
   }
 
   /**
+   * Like Array.every; returns true if all elements satifsy the predicate
+   * @param predicate
+   * @param thisArg?
+   * @returns boolean
+   */
+  every(predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown, thisArg?: any): boolean{
+    let index = 0;
+
+    for(let item of this){
+      if (!predicate.call(thisArg, item, index, this))
+        return false;
+
+      index++;
+    }
+
+    return true;
+  }
+
+    /**
+   * Like Array.some; returns true if at least one element satisfies the predicate
+   * @param predicate
+   * @param thisArg?
+   * @returns boolean
+   */
+  some(predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown, thisArg?: any): boolean{
+    let index = 0;
+
+    for(let item of this){
+      if (predicate.call(thisArg, item, index, this))
+        return true;
+
+      index++;
+    }
+
+    return false;
+  }
+
+  /**
    * Get element at the given index
    * @param index the index to search for
    */
