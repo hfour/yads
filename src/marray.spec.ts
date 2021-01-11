@@ -103,6 +103,34 @@ describe('array', () => {
     });
   });
 
+  describe('MArray mapping filtering reducing', () => {
+    it('should reduce numbered array', () => {
+      let arr = new MArray(0, 1, 2, 3, 4);
+
+      let result = arr.reduce((acc, itm) => acc + itm, 0);
+
+      expect(result).toEqual(10);
+    });
+
+    it('should map numbers to strings', () => {
+      let arr = new MArray(0, 1, 2, 3, 4);
+      let res = new MArray('0', '1', '2', '3', '4');
+
+      let result = arr.map(itm => itm.toString());
+
+      expect(result).toEqual(res);
+    });
+
+    it('should filter numbers', () => {
+      let arr = new MArray(0, 1, 2, 3, 4);
+      let res = new MArray(0, 2, 4);
+
+      let result = arr.filter(i => i % 2 === 0);
+
+      expect(result).toEqual(res);
+    });
+  });
+
   describe('MArray iteration test suite', () => {
     it('should be iterable by a for...of loop', () => {
       const mArray = new MArray(1, 2, 3, 4, 5);

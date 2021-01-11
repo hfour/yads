@@ -127,6 +127,45 @@ export class MArray<T> {
     return this.$data.getField(monoid);
   }
 
+  reduce<Val>(
+    operation: (acc: Val, currVal: T, currIndex?: number, arr?: this) => Val,
+    accumulator: Val,
+  ): Val {
+    let index = 0;
+
+    for (let item of this) {
+      accumulator = operation(accumulator, item, index, this);
+      index++;
+    }
+
+    return accumulator;
+  }
+
+  map(operation: (item: T, index?: number, arr?: this) => any, thisArg?: any): MArray<any> {
+    let index = 0;
+    let result = new MArray();
+
+    for (let item of this) {
+      let newItem = operation.call(thisArg, item, index, this);
+      result.push(newItem);
+      index++;
+    }
+
+    return result;
+  }
+
+  filter(predicate: (item: T, index?: number, arr?: this) => boolean, thisArg?: any): MArray<T> {
+    let index = 0;
+    let result = new MArray<T>();
+
+    for (let item of this) {
+      if (predicate.call(thisArg, item, index, this)) result.push(item);
+      index++;
+    }
+
+    return result;
+  }
+
   find(
     predicate: (item: T, index?: number, mArray?: MArray<T>) => boolean,
     thisArg?: any,
