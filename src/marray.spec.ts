@@ -126,6 +126,29 @@ describe('array', () => {
       expect(res).toBe(false);
     })
 
+    it('some() returns true if at least one element satisfies a predicate', () => {
+      let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'bx');
+
+      let res = a.some(x => x.includes('y'));
+
+      expect(res).toBe(true);
+    })
+
+    it('some() returns true if all the elements satisfy a predicate', () => {
+      let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'bx');
+
+      let res = a.some(x => x.includes('x'));
+
+      expect(res).toBe(true);
+    })
+
+    it('some() returns false if none of the elements satisfy a predicate', () => {
+      let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'bx');
+
+      let res = a.some(x => x.includes('l'));
+
+      expect(res).toBe(false);
+    })
   });
 
   describe('MArray iteration test suite', () => {

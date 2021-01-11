@@ -116,6 +116,19 @@ export class MArray<T> {
     return true;
   }
 
+  some(predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown, thisArg?: any): boolean{
+    let index = 0;
+
+    for(let item of this){
+      if (predicate.call(thisArg, item, index, this))
+        return true;
+
+      index++;
+    }
+
+    return false;
+  }
+
   /**
    * Get element at the given index
    * @param index the index to search for
