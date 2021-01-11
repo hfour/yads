@@ -111,8 +111,6 @@ export class MArray<T> {
    */
   every(predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown, thisArg?: any): boolean{
     let index = 0;
-    let a = ['a'];
-    a.every
 
     for(let item of this){
       if (!predicate.call(thisArg, item, index, this))
