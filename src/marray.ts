@@ -103,8 +103,16 @@ export class MArray<T> {
     return MArray.from(resultArray);
   }
 
+  /**
+   * Like Array.every; returns true if all elements satifsy the predicate
+   * @param predicate
+   * @param thisArg?
+   * @returns boolean
+   */
   every(predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown, thisArg?: any): boolean{
     let index = 0;
+    let a = ['a'];
+    a.every
 
     for(let item of this){
       if (!predicate.call(thisArg, item, index, this))
@@ -116,6 +124,12 @@ export class MArray<T> {
     return true;
   }
 
+    /**
+   * Like Array.some; returns true if at least one element satisfies the predicate
+   * @param predicate
+   * @param thisArg?
+   * @returns boolean
+   */
   some(predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown, thisArg?: any): boolean{
     let index = 0;
 
