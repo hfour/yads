@@ -101,6 +101,31 @@ describe('array', () => {
       expect(resLowerBound).toEqual(0);
       expect(resOverLowerBound).toEqual(-1);
     });
+
+    it('every() returns true if all elements satisfy a predicate', () => {
+      let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'bx');
+
+      let res = a.every(x => x.includes('x'));
+
+      expect(res).toBe(true);
+    })
+
+    it('every() returns false if at least one element does not satisfy a predicate', () => {
+      let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'b');
+
+      let res = a.every(x => x.includes('x'));
+
+      expect(res).toBe(false);
+    })
+
+    it('every() returns false if all the elements do not satisfy a predicate', () => {
+      let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'b');
+
+      let res = a.every(x => x.includes('l'));
+
+      expect(res).toBe(false);
+    })
+
   });
 
   describe('MArray iteration test suite', () => {

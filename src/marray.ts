@@ -103,6 +103,19 @@ export class MArray<T> {
     return MArray.from(resultArray);
   }
 
+  every(predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown, thisArg?: any): boolean{
+    let index = 0;
+
+    for(let item of this){
+      if (!predicate.call(thisArg, item, index, this))
+        return false;
+
+      index++;
+    }
+
+    return true;
+  }
+
   /**
    * Get element at the given index
    * @param index the index to search for
