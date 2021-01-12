@@ -103,8 +103,8 @@ describe('array', () => {
     });
   });
 
-  describe('MArray mapping filtering reducing', () => {
-    it('should reduce numbered array', () => {
+  describe('MArray - mapping, filtering and reducing', () => {
+    it('Should reduce (+) numbered array', () => {
       let arr = new MArray(0, 1, 2, 3, 4);
 
       let result = arr.reduce((acc, itm) => acc + itm, 0);
@@ -112,7 +112,7 @@ describe('array', () => {
       expect(result).toEqual(10);
     });
 
-    it('should map numbers to strings', () => {
+    it('Should map numbers to strings', () => {
       let arr = new MArray(0, 1, 2, 3, 4);
       let res = new MArray('0', '1', '2', '3', '4');
 
@@ -121,11 +121,37 @@ describe('array', () => {
       expect(result).toEqual(res);
     });
 
-    it('should filter numbers', () => {
+    it('Should map numbers using thisArg', () => {
+      let arr = new MArray(0, 1, 2, 3, 4);
+      let res = new MArray(5, 6, 7, 8, 9);
+
+      function summer(this: any, x: any): number {
+        return this.add + x;
+      }
+
+      let result = arr.map(summer, { add: 5 });
+
+      expect(result).toEqual(res);
+    });
+
+    it('Should filter numbers', () => {
       let arr = new MArray(0, 1, 2, 3, 4);
       let res = new MArray(0, 2, 4);
 
       let result = arr.filter(i => i % 2 === 0);
+
+      expect(result).toEqual(res);
+    });
+
+    it('Should filter numbers using thisArg', () => {
+      let arr = new MArray(0, 1, 2, 3, 4);
+      let res = new MArray(0, 2, 4);
+
+      function filter(this: any, x: number): boolean {
+        return this.f(x);
+      }
+
+      let result = arr.filter(filter, { f: (x: number) => x % 2 === 0 });
 
       expect(result).toEqual(res);
     });
