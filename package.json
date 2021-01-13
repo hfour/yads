@@ -31,5 +31,6 @@
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}"
     ]
-  }
+  },
+  "version": "1.0.0"
 }
