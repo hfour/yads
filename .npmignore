@@ -1,0 +1,24 @@
+.env
+.cache
+node_modules/
+dist/
+*.log
+**/dev/build.js
+**/dev/build.js.map
+npm-debug.log
+package-lock.json
+.webpack-cache
+.DS_Store
+# coverage
+.nyc_output
+coverage
+*.swp
+yarn.lock
+.gitignore
+*.tgz
+/tests
+/dev
+/.vscode
+/@types
+/.github
+.prettierrc

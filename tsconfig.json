@@ -1,7 +1,10 @@
 {
+  "include": ["src"],
   "compilerOptions": {
     "preserveWatchOutput": true,
     "outDir": "./build",
+    "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
     "module": "commonjs",
     "moduleResolution": "node",

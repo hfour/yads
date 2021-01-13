@@ -1,5 +1,8 @@
 {
   "name": "@hfour/yads",
+  "private": false,
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "dependencies": {
     "mobx": "^5.9.0"
   },
@@ -16,6 +19,8 @@
     "> 5%"
   ],
   "scripts": {
+    "build": "tsc",
+    "prepublish": "tsc",
     "test": "node_modules/.bin/jest",
     "browser": "node_modules/.bin/parcel dev/index.html --no-hmr"
   },
