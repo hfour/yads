@@ -81,9 +81,12 @@ export class MArray<T> {
     }
     end = !end || end > this.length ? this.length : end;
 
-    for (let i = start; i < end; i++) {
-      extractedElements.push(this[i]);
+    if (end > start) {
+      for (let node of tu.iterateData(this.$data, start, end - start)) {
+        extractedElements.push(node);
+      }
     }
+
     return extractedElements;
   }
 
