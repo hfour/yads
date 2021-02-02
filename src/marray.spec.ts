@@ -108,7 +108,7 @@ describe('array', () => {
       let res = a.every(x => x.includes('x'));
 
       expect(res).toBe(true);
-    })
+    });
 
     it('every() returns false if at least one element does not satisfy a predicate', () => {
       let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'b');
@@ -116,7 +116,7 @@ describe('array', () => {
       let res = a.every(x => x.includes('x'));
 
       expect(res).toBe(false);
-    })
+    });
 
     it('every() returns false if all the elements do not satisfy a predicate', () => {
       let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'b');
@@ -124,7 +124,7 @@ describe('array', () => {
       let res = a.every(x => x.includes('l'));
 
       expect(res).toBe(false);
-    })
+    });
 
     it('some() returns true if at least one element satisfies a predicate', () => {
       let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'bx');
@@ -132,7 +132,7 @@ describe('array', () => {
       let res = a.some(x => x.includes('y'));
 
       expect(res).toBe(true);
-    })
+    });
 
     it('some() returns true if all the elements satisfy a predicate', () => {
       let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'bx');
@@ -140,7 +140,7 @@ describe('array', () => {
       let res = a.some(x => x.includes('x'));
 
       expect(res).toBe(true);
-    })
+    });
 
     it('some() returns false if none of the elements satisfy a predicate', () => {
       let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'bx');
@@ -148,7 +148,7 @@ describe('array', () => {
       let res = a.some(x => x.includes('l'));
 
       expect(res).toBe(false);
-    })
+    });
   });
 
   describe('MArray - mapping, filtering and reducing', () => {
@@ -202,6 +202,39 @@ describe('array', () => {
       let result = arr.filter(filter, { f: (x: number) => x % 2 === 0 });
 
       expect(result).toEqual(res);
+    });
+  });
+
+  describe('MArray slice method tests suite', () => {
+    it('should return a copy of the array when passed no arguments', () => {
+      const arr = new MArray(1, 3, 5, 7, 9);
+
+      expect(arr.slice()).toEqual(arr);
+      expect(arr.length).toEqual(5);
+    });
+
+    it('should not modify the original array', () => {
+      const arr = new MArray(0, 1, 1, 2, 3, 5);
+      arr.slice(1, 3);
+
+      expect(arr.length).toEqual(6);
+    });
+
+    it('should behave in the same way as Array.slice', () => {
+      const arr = [1, 2, 3, 4, 5];
+      const marr = MArray.from(arr);
+
+      expect(marr.slice().toArray()).toEqual(arr.slice());
+      expect(marr.slice(4).toArray()).toEqual(arr.slice(4));
+      expect(marr.slice(6).toArray()).toEqual(arr.slice(6));
+      expect(marr.slice(0, 3).toArray()).toEqual(arr.slice(0, 3));
+      expect(marr.slice(1, 3).toArray()).toEqual(arr.slice(1, 3));
+      expect(marr.slice(4, 3).toArray()).toEqual(arr.slice(4, 3));
+      expect(marr.slice(1, 6).toArray()).toEqual(arr.slice(1, 6));
+      expect(marr.slice(-2).toArray()).toEqual(arr.slice(-2));
+      expect(marr.slice(1, -1).toArray()).toEqual(arr.slice(1, -1));
+      expect(marr.slice(-2, -3).toArray()).toEqual(arr.slice(-2, -3));
+      expect(marr.slice(-3, -2).toArray()).toEqual(arr.slice(-3, -2));
     });
   });
 

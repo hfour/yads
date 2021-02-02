@@ -62,6 +62,35 @@ export class MArray<T> {
   }
 
   /**
+   * Like Array.slice - Returns a section of an array.
+   * @param start The beginning of the specified portion of the array.
+   * @param end The end of the specified portion of the array, exclusive of the element at the index 'end'.
+   */
+  slice(start?: number, end?: number) {
+    const extractedElements = new MArray<T>();
+
+    if (start > this.length) {
+      return extractedElements;
+    } else if (start < 0) {
+      start = this.length + start;
+    }
+    start = start ?? 0;
+
+    if (end < 0) {
+      end = this.length + end;
+    }
+    end = !end || end > this.length ? this.length : end;
+
+    if (end > start) {
+      for (let node of tu.iterateData(this.$data, start, end - start)) {
+        extractedElements.push(node);
+      }
+    }
+
+    return extractedElements;
+  }
+
+  /**
    * Like Array.splice
    * @param at the position
    * @param deleteCount item count to delete
@@ -109,12 +138,14 @@ export class MArray<T> {
    * @param thisArg?
    * @returns boolean
    */
-  every(predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown, thisArg?: any): boolean{
+  every(
+    predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown,
+    thisArg?: any,
+  ): boolean {
     let index = 0;
 
-    for(let item of this){
-      if (!predicate.call(thisArg, item, index, this))
-        return false;
+    for (let item of this) {
+      if (!predicate.call(thisArg, item, index, this)) return false;
 
       index++;
     }
@@ -122,18 +153,20 @@ export class MArray<T> {
     return true;
   }
 
-    /**
+  /**
    * Like Array.some; returns true if at least one element satisfies the predicate
    * @param predicate
    * @param thisArg?
    * @returns boolean
    */
-  some(predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown, thisArg?: any): boolean{
+  some(
+    predicate: (value: T, index?: number, mArray?: MArray<T>) => unknown,
+    thisArg?: any,
+  ): boolean {
     let index = 0;
 
-    for(let item of this){
-      if (predicate.call(thisArg, item, index, this))
-        return true;
+    for (let item of this) {
+      if (predicate.call(thisArg, item, index, this)) return true;
 
       index++;
     }
