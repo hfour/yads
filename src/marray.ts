@@ -96,11 +96,22 @@ export class MArray<T> {
    * @param deleteCount item count to delete
    * @param items items to insert
    */
-  splice(at: number, deleteCount: number, ...items: T[]) {
-    tu.remove(this.$data, at, deleteCount);
+  splice(at: number, deleteCount?: number, ...items: T[]) {
+    let deletedElements = new MArray<T>();
+    at = at < 0 ? this.length + at : at;
+
+    if (at < this.length) {
+      deleteCount = deleteCount ?? this.length - at;
+      if (deleteCount > 0) {
+        deletedElements = this.slice(at, at + deleteCount);
+        tu.remove(this.$data, at, deleteCount);
+      }
+    }
     if (items.length > 0) {
       tu.insert(this.$data, at, items);
     }
+
+    return deletedElements;
   }
 
   /**

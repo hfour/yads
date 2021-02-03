@@ -150,6 +150,13 @@ describe('Internal tree structure', () => {
     expect(atIndex(tree, 2).data).toBe(14);
   });
 
+  it('Correctly removes all nodes', () => {
+    const tree = fromArray(data);
+    remove(tree, 0, data.length);
+    expect(isBalanced(tree)).toBeTruthy();
+    expect(tree.getField(Size)).toEqual(0);
+  });
+
   it('Correctly inserts a single node at the start', () => {
     const tree = fromArray(data);
     insert(tree, 0, [-1]);

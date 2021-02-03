@@ -148,8 +148,8 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
             // Special case, if we remove the entire tree, empty the root.
             while (node.size) {
               node.pop();
-              return;
             }
+            return;
           } else {
             // Otherwise remove the entire node
             count -= node.getField(Size);
