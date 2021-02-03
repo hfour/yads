@@ -238,6 +238,111 @@ describe('array', () => {
     });
   });
 
+  describe('MArray splice method tests suite', () => {
+    let arr = new Array();
+    let marr = new MArray();
+
+    beforeEach(() => {
+      arr = [1, 2, 3, 4, 5];
+      marr = MArray.from(arr);
+    });
+
+    it('should return a copy of the array and remove all elements from the original one', () => {
+      const spliced = marr.splice(0);
+
+      expect(marr.length).toEqual(0);
+      expect(spliced.toArray()).toEqual(arr.splice(0));
+    });
+
+    it('should preserve all elements from the original array', () => {
+      const originalLength = marr.length;
+      const spliced = marr.splice(1, 0);
+
+      expect(marr.length).toEqual(originalLength);
+      expect(spliced.length).toEqual(0);
+      expect(spliced.toArray()).toEqual(arr.splice(1, 0));
+      expect(marr.toArray()).toEqual(arr);
+    });
+
+    it('should remove the last element of the array and return it', () => {
+      const spliced = marr.splice(marr.length - 1);
+
+      expect(marr.length).toEqual(4);
+      expect(spliced.toArray()).toEqual(arr.splice(arr.length - 1));
+      expect(marr.toArray()).toEqual(arr);
+    });
+
+    it('should remove the two last elements (negative index) and return them', () => {
+      const spliced = marr.splice(-2);
+
+      expect(spliced.toArray()).toEqual([4, 5]);
+      expect(spliced.toArray()).toEqual(arr.splice(-2));
+      expect(marr.toArray()).toEqual(arr);
+    });
+
+    it('should return an empty array for a non-existing index', () => {
+      const spliced = marr.splice(6);
+
+      expect(spliced.length).toEqual(0);
+      expect(spliced.toArray()).toEqual(arr.splice(6));
+      expect(marr.toArray()).toEqual(arr);
+    });
+
+    it('should remove the first two elements and return them', () => {
+      const spliced = marr.splice(0, 2);
+
+      expect(spliced.length).toEqual(2);
+      expect(spliced.toArray()).toEqual(arr.splice(0, 2));
+      expect(marr.toArray()).toEqual(arr);
+    });
+
+    it('should remove the next two elements from the specified index and return them', () => {
+      const spliced = marr.splice(1, 2);
+
+      expect(spliced.toArray()).toEqual([2, 3]);
+      expect(spliced.toArray()).toEqual(arr.splice(1, 2));
+      expect(marr.toArray()).toEqual(arr);
+    });
+
+    it('should remove the last element only if the delete count exceeds array length', () => {
+      const spliced = marr.splice(marr.length - 1, 2);
+
+      expect(spliced.length).toEqual(1);
+      expect(spliced.toArray()).toEqual(arr.splice(arr.length - 1, 2));
+      expect(marr.toArray()).toEqual(arr);
+    });
+
+    it('should insert an element at index without removing existing ones', () => {
+      const spliced = marr.splice(1, 0, 8);
+
+      expect(spliced.length).toEqual(0);
+      expect(marr.length).toEqual(6);
+      expect(marr[1]).toEqual(8);
+      expect(spliced.toArray()).toEqual(arr.splice(1, 0, 8));
+      expect(marr.toArray()).toEqual(arr);
+    });
+
+    it('should insert multiple elements without removing existing ones', () => {
+      const spliced = marr.splice(1, 0, 4, 12, 60);
+
+      expect(spliced.length).toEqual(0);
+      expect(marr.length).toEqual(8);
+      expect([marr[1], marr[2], marr[3]]).toEqual([4, 12, 60]);
+      expect(spliced.toArray()).toEqual(arr.splice(1, 0, 4, 12, 60));
+      expect(marr.toArray()).toEqual(arr);
+    });
+
+    it('should remove elements and insert new ones at a specified index', () => {
+      const spliced = marr.splice(1, 2, 10, 50, 100);
+
+      expect(spliced.length).toEqual(2);
+      expect(marr.length).toEqual(6);
+      expect([marr[1], marr[2], marr[3]]).toEqual([10, 50, 100]);
+      expect(spliced.toArray()).toEqual(arr.splice(1, 2, 10, 50, 100));
+      expect(marr.toArray()).toEqual(arr);
+    });
+  });
+
   describe('MArray iteration test suite', () => {
     it('should be iterable by a for...of loop', () => {
       const mArray = new MArray(1, 2, 3, 4, 5);
