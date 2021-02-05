@@ -382,11 +382,21 @@ describe('array', () => {
 
       regArray.forEach((v, i, a) => regResult.push([v, i, a]));
       mArray.forEach((v, i, a) => {
-        expect(a).toBeInstanceOf(MArray);
+        expect(a).toBe(mArray);
         marrayResult.push([v, i, [...a]]);
       });
 
+      expect(mArray.toArray()).toEqual(regArray); // ensure not mutated
       expect(regResult).toEqual(marrayResult);
+    });
+
+    it('should not return anything when forEach through an empty MArray', () => {
+      const mArray = new MArray();
+      let result: any[] = [];
+
+      mArray.forEach(v => result.push(v));
+
+      expect(result).toHaveLength(0);
     });
   });
 });
