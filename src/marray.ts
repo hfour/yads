@@ -287,6 +287,15 @@ export class MArray<T> {
     return tu.iterateData(this.$data);
   }
 
+  forEach(callbackfn: (value: T, index: number, array: MArray<T>) => void, thisArg?: any): void {
+    let index = 0;
+
+    for (const value of this) {
+      callbackfn.call(thisArg, value, index, this);
+      index++;
+    }
+  }
+
   toArray() {
     let res = [];
     for (let item of this) res.push(item);
