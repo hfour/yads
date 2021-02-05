@@ -373,6 +373,31 @@ describe('array', () => {
 
       expect(result1).toEqual(result2);
     });
+
+    it('should behave in a same way as a regular array when being iterated with a MArray.forEach', () => {
+      const regArray = [2, 4, 6, 8, 10];
+      const mArray = new MArray(...regArray);
+      const regResult: [number, number, number[]][] = [];
+      const marrayResult: typeof regResult = [];
+
+      regArray.forEach((v, i, a) => regResult.push([v, i, a]));
+      mArray.forEach((v, i, a) => {
+        expect(a).toBe(mArray);
+        marrayResult.push([v, i, [...a]]);
+      });
+
+      expect(mArray.toArray()).toEqual(regArray); // ensure not mutated
+      expect(regResult).toEqual(marrayResult);
+    });
+
+    it('should not return anything when forEach through an empty MArray', () => {
+      const mArray = new MArray();
+      let result: any[] = [];
+
+      mArray.forEach(v => result.push(v));
+
+      expect(result).toHaveLength(0);
+    });
   });
 });
 
