@@ -1,16 +1,12 @@
 import * as ts from './tree-structure';
 import * as tu from './tree-utils';
-
-function toInteger(s: any): number | null {
-  if (s === '' || typeof s === 'symbol') return null;
-  let n = Number(s);
-  if (Number.isInteger(n)) return n;
-  return null;
-}
+import { EventHandler, toInteger } from './marray-utils';
 
 export class MArray<T> {
   [n: number]: T;
   private $data: ts.INode<T>;
+  private onCreateHandler: EventHandler<T>;
+  private onRemoveHandler: EventHandler<T>;
 
   static from<T>(items: Iterable<T>) {
     const arr = new MArray<T>();
@@ -20,6 +16,8 @@ export class MArray<T> {
 
   constructor(...items: T[]) {
     this.$data = tu.fromArray(items);
+    this.onCreateHandler = new EventHandler();
+    this.onRemoveHandler = new EventHandler();
 
     return new Proxy(this, {
       get: (target, prop, receiver) => {
@@ -40,25 +38,59 @@ export class MArray<T> {
     });
   }
 
+  track(onCreated: (t: T) => void, onRemoved: (t: T) => void) {
+    this.onCreateHandler.addListener(onCreated);
+    this.onRemoveHandler.addListener(onRemoved);
+    return () => {
+      this.onCreateHandler.removeListener(onCreated);
+      this.onRemoveHandler.removeListener(onRemoved);
+    };
+  }
+
+  /**
+   * Insert items at given position
+   * @param at the position
+   * @param item the content
+   */
+  private insert(at: number, items: T[]) {
+    tu.insert(this.$data, at, items);
+    items.forEach(i => this.onCreateHandler.run(i));
+  }
+
+  /**
+   * Removes the specified number of items from a given index
+   * @param start the starting index
+   * @param count number of items to be removed
+   */
+  private remove(start: number, count: number) {
+    let removed;
+    if (count > 0) removed = this.slice(start, start + count);
+    tu.remove(this.$data, start, count);
+    for (let i of removed) {
+      this.onRemoveHandler.run(i);
+    }
+  }
+
   push(...items: T[]) {
-    tu.insert(this.$data, this.length, items);
+    this.insert(this.length, items);
   }
 
   pop() {
     let lastIndex = this.$data.getField(tu.Size) - 1;
+    if (lastIndex < 0) return undefined;
     let item = tu.atIndex(this.$data, lastIndex);
-    tu.remove(this.$data, lastIndex, 1);
+    this.remove(lastIndex, 1);
     return item.data;
   }
 
   shift() {
     let item = tu.atIndex(this.$data, 0);
-    tu.remove(this.$data, 0, 1);
+    this.remove(0, 1);
     return item.data;
   }
 
   unshift(t: T) {
-    tu.insert(this.$data, 0, [t]);
+    this.insert(0, [t]);
   }
 
   /**
@@ -104,23 +136,14 @@ export class MArray<T> {
       deleteCount = deleteCount ?? this.length - at;
       if (deleteCount > 0) {
         deletedElements = this.slice(at, at + deleteCount);
-        tu.remove(this.$data, at, deleteCount);
+        this.remove(at, deleteCount);
       }
     }
     if (items.length > 0) {
-      tu.insert(this.$data, at, items);
+      this.insert(at, items);
     }
 
     return deletedElements;
-  }
-
-  /**
-   * Insert item at given position
-   * @param at the position
-   * @param item the content
-   */
-  insert(at: number, item: T) {
-    tu.insert(this.$data, at, [item]);
   }
 
   /**
@@ -144,7 +167,7 @@ export class MArray<T> {
   }
 
   /**
-   * Like Array.every; returns true if all elements satifsy the predicate
+   * Like Array.every; returns true if all elements satisfy the predicate
    * @param predicate
    * @param thisArg?
    * @returns boolean
@@ -194,7 +217,13 @@ export class MArray<T> {
   }
 
   update(index: number, val: T) {
-    tu.atIndex(this.$data, index).data = val;
+    const dataHolder = tu.atIndex(this.$data, index);
+    const oldVal = dataHolder.data;
+    dataHolder.data = val;
+    if (val !== oldVal) {
+      this.onRemoveHandler.run(oldVal);
+      this.onCreateHandler.run(val);
+    }
   }
 
   foldTo<Val>(index: number, monoid: ts.MonoidObj<Val, T>) {
