@@ -429,3 +429,146 @@ describe('virtual parents', () => {
     }
   });
 });
+
+describe('MArray track array functionality test suite', () => {
+  let marr: MArray<number>;
+  let added: MArray<number>;
+  let removed: MArray<number>;
+
+  beforeEach(() => {
+    marr = new MArray(2, 4, 6, 8, 10);
+    added = new MArray<number>();
+    removed = new MArray<number>();
+  });
+
+  it('should track additions for a tracked MArray', () => {
+    marr.track(
+      item => added.push(item),
+      () => {},
+    );
+
+    marr.push(100);
+    expect(added[0]).toEqual(100);
+
+    marr.splice(marr.length - 1, 0, 200);
+    expect(added[1]).toEqual(200);
+
+    marr.unshift(300);
+    expect(added[2]).toEqual(300);
+  });
+
+  it('should track deletions for a tracked MArray', () => {
+    marr.track(
+      () => {},
+      item => removed.push(item),
+    );
+
+    marr.splice(4);
+    expect(removed[0]).toEqual(10);
+
+    marr.pop();
+    expect(removed[1]).toEqual(8);
+
+    marr.shift();
+    expect(removed[2]).toEqual(2);
+
+    marr.splice(0, 2);
+    expect([removed[3], removed[4]]).toEqual([4, 6]);
+    expect(removed.length).toEqual(5);
+
+    marr.pop();
+    expect(removed.length).toEqual(5); //no changes since there are no items left
+  });
+
+  it('should track additions, deletions and updates for a tracked MArray', () => {
+    marr.track(
+      item => added.push(item),
+      item => removed.push(item),
+    );
+
+    marr.pop();
+    expect(removed[0]).toEqual(10);
+
+    marr.push(12);
+    expect(added[0]).toEqual(12);
+
+    marr.update(0, 1);
+    expect(added[1]).toEqual(1);
+    expect(removed[1]).toEqual(2);
+
+    marr[0] = 0;
+    expect(added[2]).toEqual(0);
+    expect(removed[2]).toEqual(1);
+    expect(added.length).toEqual(3);
+    expect(removed.length).toEqual(3);
+
+    marr[0] = 0;
+    expect(added.length).toEqual(3); // no changes since we are assigning the same value
+    expect(removed.length).toEqual(3); // no changes since we are assigning the same value
+  });
+
+  it('should correctly track a MArray that has been tracked multiple times', () => {
+    let events = new MArray<string>();
+    let eventCount = 0;
+
+    marr.track(
+      item => added.push(item),
+      item => removed.push(item),
+    );
+
+    marr.track(
+      item => events.push(`added item: ${item}`),
+      item => events.push(`removed item: ${item}`),
+    );
+
+    marr.track(
+      _ => (eventCount += 1),
+      _ => (eventCount += 1),
+    );
+
+    marr.pop();
+    marr.push(12);
+    marr.splice(0, 1, 100);
+    marr[2] = marr[2] * 10;
+
+    expect(removed).toEqual(MArray.from([10, 2, 6]));
+    expect(added).toEqual(MArray.from([12, 100, 60]));
+    expect(events).toEqual(
+      MArray.from([
+        'removed item: 10',
+        'added item: 12',
+        'removed item: 2',
+        'added item: 100',
+        'removed item: 6',
+        'added item: 60',
+      ]),
+    );
+    expect(eventCount).toEqual(6);
+  });
+
+  it('should correctly stop tracking a tracked MArray', () => {
+    const untrack = marr.track(
+      item => added.push(item),
+      item => removed.push(item),
+    );
+
+    marr.pop();
+    marr.push(100);
+    marr[0] = 500;
+
+    expect(removed).toEqual(MArray.from([10, 2]));
+    expect(added).toEqual(MArray.from([100, 500]));
+    expect(marr).toEqual(new MArray(500, 4, 6, 8, 100));
+    expect([removed.length, added.length]).toEqual([2, 2]);
+
+    untrack();
+
+    marr.pop();
+    marr.splice(1, 2, 400, 300);
+    marr[3] = 200;
+    marr.push(100);
+
+    expect(marr).toEqual(MArray.from([500, 400, 300, 200, 100]));
+    expect([removed.length, added.length]).toEqual([2, 2]); // the changes after the untrack should't be added
+  });
+});
