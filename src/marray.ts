@@ -217,8 +217,9 @@ export class MArray<T> {
   }
 
   update(index: number, val: T) {
-    const oldVal = tu.atIndex(this.$data, index).data;
-    tu.atIndex(this.$data, index).data = val;
+    const dataHolder = tu.atIndex(this.$data, index);
+    const oldVal = dataHolder.data;
+    dataHolder.data = val;
     if (val !== oldVal) {
       this.onRemoveHandler.run(oldVal);
       this.onCreateHandler.run(val);
