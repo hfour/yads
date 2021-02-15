@@ -9,6 +9,7 @@ import {
   iterate,
   iterateData,
   ChildIndex,
+  findIndex,
 } from '../src';
 import { isBalanced } from './test.util';
 
@@ -430,5 +431,19 @@ describe('Internal tree structure', () => {
       result_for_loop.push(i);
     }
     expect(result_iterate_data).toEqual(result_for_loop);
+  });
+
+  it('should find index based on a given condition', () => {
+    const tree = fromArray([1, 2, 3, 4, 5]);
+
+    const Total = {
+      operation: (a: number, b: number) => a + b,
+      identity: 0,
+      getCacheValue: (a: number) => a,
+    };
+
+    expect(findIndex(tree, Total, c => c <= 6)).toEqual(3);
+    expect(findIndex(tree, Total, c => c <= 10)).toEqual(4);
+    expect(findIndex(tree, Total, c => c === 100)).toEqual(0);
   });
 });
