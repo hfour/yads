@@ -259,7 +259,7 @@ export class INode<T> extends BaseNode<T> {
   @action
   push(child: BaseNode<T>, pos: ChildIndex = this.size as ChildIndex) {
     if (this.size === 4) {
-      throw new Error('Can not add more than 4 children to a node');
+      throw new Error('Cannot add more than 4 children to a node');
     }
 
     if (pos - this.size > 0) {
