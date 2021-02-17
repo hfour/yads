@@ -8,6 +8,8 @@ import {
   insert,
   iterate,
   iterateData,
+  ChildIndex,
+  findIndex,
 } from '../src';
 import { isBalanced } from './test.util';
 
@@ -50,6 +52,67 @@ describe('Internal tree structure', () => {
     }
   });
 
+  it('Rebalances an empty tree', () => {
+    const tree = fromArray([]);
+    tree.rebalance();
+
+    expect(isBalanced(tree)).toBeTruthy();
+  });
+
+  it('Rebalances a tree after removing the last leaf of a child', () => {
+    const tree = fromArray([1, 2, 3, 4]);
+
+    const parent = tree.childAt(1) as INode<number>;
+    parent.pop();
+    parent.pop();
+
+    parent.rebalance();
+    expect(isBalanced(tree)).toBeTruthy();
+    expect(tree.childAt(1)).toBeInstanceOf(Leaf);
+  });
+
+  it('Correctly returns previous nodes at same level', () => {
+    const tree = fromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+    let prevNode = atIndex(tree, 8).prevNodeAtSameLevel as Leaf<number>;
+    expect(prevNode.data).toEqual(8);
+
+    prevNode = atIndex(tree, 1).prevNodeAtSameLevel as Leaf<number>;
+    expect(prevNode.data).toEqual(1);
+
+    prevNode = prevNode.prevNodeAtSameLevel as Leaf<number>;
+    expect(prevNode).toBeNull();
+
+    const topLevelPrevNode = tree.prevNodeAtSameLevel;
+    expect(topLevelPrevNode).toBeNull();
+  });
+
+  it('Correctly returns next nodes at same level', () => {
+    const tree = fromArray([1, 2, 3, 4, 5]);
+
+    let nextNode = atIndex(tree, 3).nextNodeAtSameLevel as Leaf<number>;
+    expect(nextNode.data).toEqual(5);
+
+    nextNode = nextNode.nextNodeAtSameLevel as Leaf<number>;
+    expect(nextNode).toBeNull();
+
+    const topLevelNextNode = tree.nextNodeAtSameLevel;
+    expect(topLevelNextNode).toBeNull();
+  });
+
+  it('Correctly accesses child nodes by child index', () => {
+    const tree = fromArray(data);
+
+    const leaf = atIndex(tree, 2);
+    const node = leaf.parent;
+    const child1 = node.childAt(0) as Leaf<number>;
+    const child2 = node.childAt(1) as Leaf<number>;
+
+    expect(child1.data).toEqual(2);
+    expect(child2.data).toEqual(3);
+    expect(() => node.childAt(4 as ChildIndex)).toThrowError();
+  });
+
   it('Correctly accesses nodes by index', () => {
     const tree = fromArray(data);
     expect(atIndex(tree, 0).data).toBe(0);
@@ -72,6 +135,21 @@ describe('Internal tree structure', () => {
     node.parent.push(new Leaf(66), 2);
     node.parent.rebalance();
     expect(isBalanced(tree)).toBeTruthy();
+  });
+
+  it('Throws when trying to push a child node at unexpected positions', () => {
+    const tree = fromArray([0, 1, 2, 3]);
+    const node = atIndex(tree, 2);
+
+    expect(() => node.parent.push(new Leaf(100), 3)).toThrowError(
+      new Error('Cannot skip nodes when pushing'),
+    );
+
+    node.parent.push(new Leaf(101), 1);
+    node.parent.push(new Leaf(102), 1);
+    expect(() => node.parent.push(new Leaf(103), 1)).toThrowError(
+      new Error('Cannot add more than 4 children to a node'),
+    );
   });
 
   it('Correctly removes a single node at start', () => {
@@ -110,6 +188,14 @@ describe('Internal tree structure', () => {
     expect(atIndex(tree, 0).data).toBe(0);
     expect(atIndex(tree, 4).data).toBe(5);
     expect(atIndex(tree, 13).data).toBe(14);
+  });
+
+  it('Correctly removes a single node at a negative index', () => {
+    const tree = fromArray([1, 2, 3, 4]);
+    remove(tree, -3, 1);
+    expect(isBalanced(tree)).toBeTruthy();
+    expect(tree.getField(Size)).toEqual(3);
+    expect(atIndex(tree, 1).data).toEqual(3);
   });
 
   it('Correctly removes multiple nodes at start', () => {
@@ -157,6 +243,12 @@ describe('Internal tree structure', () => {
     expect(tree.getField(Size)).toEqual(0);
   });
 
+  it('Throws when trying to insert or remove at an out of bounds index', () => {
+    const tree = fromArray(data);
+    expect(() => remove(tree, 100, 1)).toThrowError('Index out of bounds');
+    expect(() => insert(tree, 100, [18])).toThrowError('Index out of bounds');
+  });
+
   it('Correctly inserts a single node at the start', () => {
     const tree = fromArray(data);
     insert(tree, 0, [-1]);
@@ -186,6 +278,13 @@ describe('Internal tree structure', () => {
     expect(atIndex(tree, 0).data).toBe(0);
     expect(atIndex(tree, 6).data).toBe(6);
     expect(atIndex(tree, 15).data).toBe(15);
+  });
+
+  it('Correctly inserts at a negative index', () => {
+    const tree = fromArray(data);
+    insert(tree, -1, [100]);
+    expect(isBalanced(tree)).toBeTruthy();
+    expect(atIndex(tree, data.length - 1).data).toBe(100);
   });
 
   it('Correctly inserts multiple nodes at the start', () => {
@@ -294,6 +393,22 @@ describe('Internal tree structure', () => {
     expect(result.length).toBe(0);
   });
 
+  it('Correctly iterates from index < 0', () => {
+    const tree = fromArray(data);
+    const result = [];
+
+    for (let node of iterate(tree, -2)) result.push(node.data);
+    expect(result.length).toEqual(2);
+    expect(result).toEqual([data[data.length - 2], data[data.length - 1]]);
+  });
+
+  it('Throws when trying to iterate over an out of bounds index', () => {
+    const tree = fromArray(data);
+    const iterator = iterate(tree, 100);
+
+    expect(() => iterator.next()).toThrowError('Index out of bounds');
+  });
+
   it('Correctly iterates data over all nodes', () => {
     const tree = fromArray(data);
     const result: number[] = [];
@@ -316,5 +431,19 @@ describe('Internal tree structure', () => {
       result_for_loop.push(i);
     }
     expect(result_iterate_data).toEqual(result_for_loop);
+  });
+
+  it('should find index based on a given condition', () => {
+    const tree = fromArray([1, 2, 3, 4, 5]);
+
+    const Total = {
+      operation: (a: number, b: number) => a + b,
+      identity: 0,
+      getCacheValue: (a: number) => a,
+    };
+
+    expect(findIndex(tree, Total, c => c <= 6)).toEqual(3);
+    expect(findIndex(tree, Total, c => c <= 10)).toEqual(4);
+    expect(findIndex(tree, Total, c => c === 100)).toEqual(0);
   });
 });

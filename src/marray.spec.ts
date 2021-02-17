@@ -1,6 +1,6 @@
 import { MArray } from './marray';
 
-let Total = {
+const Total = {
   operation: (a: number, b: number) => a + b,
   identity: 0,
   getCacheValue: (a: number) => a,
@@ -27,6 +27,7 @@ describe('array', () => {
     expect(a.toArray()).toEqual([5, 10, 2, 3, 11]);
     a[2] = 4;
     expect(a.reduceTo(2, Total)).toEqual(19);
+    expect(() => a.reduceTo(100, Total)).toThrowError('Index out of bounds');
   });
 
   describe('MArray.concat test suite', () => {
@@ -397,6 +398,26 @@ describe('array', () => {
       mArray.forEach(v => result.push(v));
 
       expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('MArray.foldTo and MArray.reduceAll test suite', () => {
+    it('should fold to specified index', () => {
+      const mArray = new MArray(1, 3, 5, 7);
+
+      expect(mArray.foldTo(2, Total)).toEqual(9);
+    });
+
+    it('should throw when trying to fold to an out of bounds index', () => {
+      const mArray = new MArray(1, 2, 3);
+
+      expect(() => mArray.foldTo(100, Total)).toThrowError('Index out of bounds');
+    });
+
+    it('should reduce all items to their sum', () => {
+      const mArray = new MArray(1, 2, 3, 4, 5);
+
+      expect(mArray.reduceAll(Total)).toEqual(15);
     });
   });
 });
