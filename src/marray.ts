@@ -325,7 +325,7 @@ export class MArray<T> {
     }
   }
 
-  toArray() {
+  toArray(): T[] {
     let res = [];
     for (let item of this) res.push(item);
     return res;
