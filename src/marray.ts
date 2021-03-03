@@ -100,10 +100,10 @@ export class MArray<T> {
    * @param end The end of the specified portion of the array, exclusive of the element at the index 'end'.
    */
   slice(start?: number, end?: number) {
-    const extractedElements = new MArray<T>();
+    const extractedElements: Array<T> = [];
 
     if (start > this.length) {
-      return extractedElements;
+      return MArray.from(extractedElements);
     } else if (start < 0) {
       start = this.length + start;
     }
@@ -120,7 +120,7 @@ export class MArray<T> {
       }
     }
 
-    return extractedElements;
+    return MArray.from(extractedElements);
   }
 
   /**
