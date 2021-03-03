@@ -62,7 +62,6 @@ export class BaseNode<T> {
   /**
    * Returns this node's previous sibling, or `null` if first
    */
-  @computed
   get prevSibling(): BaseNode<T> {
     if (this.index > 0 && this.index < 3) {
       return this.parent.childAt((this.index - 1) as ChildIndex);
@@ -73,7 +72,6 @@ export class BaseNode<T> {
   /**
    * Returns this node's next sibling, or `null` if last
    */
-  @computed
   get nextSibling(): BaseNode<T> {
     if (this.index > -1 && this.index < 2) {
       return this.parent.childAt((this.index + 1) as ChildIndex);
@@ -118,7 +116,6 @@ export class BaseNode<T> {
   /**
    * Returns the first encountered node at the same level to the right
    */
-  @computed
   get nextNodeAtSameLevel(): BaseNode<T> {
     if (!this.parent) {
       return null;
@@ -174,7 +171,6 @@ export class INode<T> extends BaseNode<T> {
     }
   }
 
-  @computed
   get a() {
     return this._0;
   }
@@ -187,7 +183,6 @@ export class INode<T> extends BaseNode<T> {
     }
   }
 
-  @computed
   get b() {
     return this._1;
   }
@@ -200,7 +195,6 @@ export class INode<T> extends BaseNode<T> {
     }
   }
 
-  @computed
   get c() {
     return this._2;
   }
@@ -213,22 +207,18 @@ export class INode<T> extends BaseNode<T> {
     }
   }
 
-  @computed
   get d() {
     return this._3;
   }
 
-  @computed
   get size() {
     return this.d ? 4 : this.c ? 3 : this.b ? 2 : this.a ? 1 : 0;
   }
 
-  @computed
   get first() {
     return this.a;
   }
 
-  @computed
   get last() {
     return this.d || this.c || this.b || this.a;
   }

@@ -10,7 +10,8 @@ export class MArray<T> {
 
   static from<T>(items: Iterable<T>) {
     const arr = new MArray<T>();
-    arr.$data = tu.fromArray([...items]);
+    if (Array.isArray(items)) arr.$data = tu.fromArray(items)
+    else arr.$data = tu.fromArray([...items]);
     return arr;
   }
 
@@ -234,6 +235,10 @@ export class MArray<T> {
     return tu.foldToIndex(this.$data, index + 1, monoid);
   }
 
+  getMonoidAt<Val>(index: number, field: ts.MonoidObj<Val, T>) {
+    return tu.atIndex(this.$data, index).getField(field)
+  }
+
   reduceAll<Val>(monoid: ts.MonoidObj<Val, T>) {
     return this.$data.getField(monoid);
   }
@@ -254,7 +259,7 @@ export class MArray<T> {
 
   map(operation: (item: T, index?: number, arr?: this) => any, thisArg?: any): MArray<any> {
     let index = 0;
-    let result = new MArray();
+    let result = []
 
     for (let item of this) {
       let newItem = operation.call(thisArg, item, index, this);
@@ -262,19 +267,19 @@ export class MArray<T> {
       index++;
     }
 
-    return result;
+    return MArray.from(result);
   }
 
   filter(predicate: (item: T, index?: number, arr?: this) => boolean, thisArg?: any): MArray<T> {
     let index = 0;
-    let result = new MArray<T>();
+    let result = [] // new MArray<T>();
 
     for (let item of this) {
       if (predicate.call(thisArg, item, index, this)) result.push(item);
       index++;
     }
 
-    return result;
+    return MArray.from(result);
   }
 
   find(

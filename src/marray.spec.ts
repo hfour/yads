@@ -488,10 +488,7 @@ describe('MArray track array functionality test suite', () => {
   });
 
   it('should track additions for a tracked MArray', () => {
-    marr.track(
-      item => added.push(item),
-      () => {},
-    );
+    marr.track(item => added.push(item), () => {});
 
     marr.push(100);
     expect(added[0]).toEqual(100);
@@ -504,10 +501,7 @@ describe('MArray track array functionality test suite', () => {
   });
 
   it('should track deletions for a tracked MArray', () => {
-    marr.track(
-      () => {},
-      item => removed.push(item),
-    );
+    marr.track(() => {}, item => removed.push(item));
 
     marr.splice(4);
     expect(removed[0]).toEqual(10);
@@ -527,10 +521,7 @@ describe('MArray track array functionality test suite', () => {
   });
 
   it('should track additions, deletions and updates for a tracked MArray', () => {
-    marr.track(
-      item => added.push(item),
-      item => removed.push(item),
-    );
+    marr.track(item => added.push(item), item => removed.push(item));
 
     marr.pop();
     expect(removed[0]).toEqual(10);
@@ -557,20 +548,14 @@ describe('MArray track array functionality test suite', () => {
     let events = new MArray<string>();
     let eventCount = 0;
 
-    marr.track(
-      item => added.push(item),
-      item => removed.push(item),
-    );
+    marr.track(item => added.push(item), item => removed.push(item));
 
     marr.track(
       item => events.push(`added item: ${item}`),
       item => events.push(`removed item: ${item}`),
     );
 
-    marr.track(
-      _ => (eventCount += 1),
-      _ => (eventCount += 1),
-    );
+    marr.track(_ => (eventCount += 1), _ => (eventCount += 1));
 
     marr.pop();
     marr.push(12);
@@ -593,10 +578,7 @@ describe('MArray track array functionality test suite', () => {
   });
 
   it('should correctly stop tracking a tracked MArray', () => {
-    const untrack = marr.track(
-      item => added.push(item),
-      item => removed.push(item),
-    );
+    const untrack = marr.track(item => added.push(item), item => removed.push(item));
 
     marr.pop();
     marr.push(100);
