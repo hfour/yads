@@ -133,6 +133,10 @@ export class MArray<T> {
     let deletedElements = new MArray<T>();
     at = at < 0 ? this.length + at : at;
 
+    if (at + deleteCount > this.length) {
+      deleteCount = this.length - at;
+    }
+
     if (at < this.length) {
       deleteCount = deleteCount ?? this.length - at;
       if (deleteCount > 0) {
