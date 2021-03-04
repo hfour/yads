@@ -118,6 +118,7 @@ export function findIndex<NodeContent, ConditionValue>(
   return foldToFindValue(root, criteriaMonoid, takeWhile, Size);
 }
 
+const ENDLESS_LOOP_BREAKER = 20 * 1024 * 1024; // should be enough for removing up to a million nodes
 /**
  * Removes `count` number of leaf nodes, starting from the `start` index
  * and leaves the tree in a balanced state.
@@ -131,16 +132,25 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
     throw new Error('Index out of bounds');
   }
 
+  if (start + count > root.getField(Size)) {
+    throw new Error('Count out of bounds');
+  }
+  let sanityChecker = ENDLESS_LOOP_BREAKER;
+
   // After each node removal, we rebalance and start over again
   // from the root. The `count` will be decremented, but the `start`
   // index will remain the same. We *can* remove entire subtrees.
   // however, due to how the balancing algo works, we can't remove
   // multiple siblings / cousins and rebalance afterwards.
+
   while (count) {
     let node: BaseNode<T> = root;
     let tmpStart = start;
 
     while (node instanceof INode) {
+      if (--sanityChecker < 0) {
+        throw new Error('Endless loop');
+      }
       if (tmpStart === 0) {
         // We have the oportunity to remove the entire node if count is bigger than it
         if (count >= node.getField(Size)) {
@@ -187,7 +197,7 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
         // them instead of doing the inner loop again.
         // Also, tmpStart can be only 1 or 2 here.
         if (node.a instanceof Leaf) {
-          while (count && node.size > 1) {
+          while (count && node.size > tmpStart) {
             count -= 1;
             node.pop(tmpStart as 1 | 2);
           }
@@ -292,4 +302,40 @@ export function* iterateData<T>(root: INode<T>, index?: number, count?: number) 
   for (let item of iterate(root, index, count)) {
     yield item.data;
   }
+}
+
+/**
+ * Converts a tree to an array consumable by `asciitree`.
+ */
+function toDebugArray(root: BaseNode<any>, pos?: string): any[];
+function toDebugArray(root: Leaf<any>, pos?: string): string;
+function toDebugArray(root: INode<any>, pos?: string): any[];
+function toDebugArray(root: BaseNode<any>, pos: string = 'R') {
+  if (root instanceof INode) {
+    const arr: any[] = [pos];
+    if (root.a) {
+      arr.push(toDebugArray(root.a, 'a'));
+    }
+    if (root.b) {
+      arr.push(toDebugArray(root.b, 'b'));
+    }
+    if (root.c) {
+      arr.push(toDebugArray(root.c, 'c'));
+    }
+    if (root.d) {
+      arr.push(toDebugArray(root.d, 'd'));
+    }
+    return arr;
+  } else if (root instanceof Leaf) {
+    return root.data;
+  } else {
+    return '[No Tree]';
+  }
+}
+
+/**
+ * Uses the "asciitree" library to print a tree to a string.
+ */
+export function printtree<T>(root: INode<T>) {
+  console.log(toDebugArray(root));
 }

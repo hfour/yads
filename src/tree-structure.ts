@@ -284,6 +284,9 @@ export class INode<T> extends BaseNode<T> {
   @action
   pop(pos: ChildIndex = (this.size - 1) as ChildIndex) {
     let popped: BaseNode<T> = null;
+    if (pos >= this.size) {
+      throw new Error('Cannot pop, node does not exist');
+    }
     switch (pos) {
       case 0: {
         popped = this.a;
