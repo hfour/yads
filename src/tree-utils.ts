@@ -118,6 +118,7 @@ export function findIndex<NodeContent, ConditionValue>(
   return foldToFindValue(root, criteriaMonoid, takeWhile, Size);
 }
 
+const ENDLESS_LOOP_BREAKER = 20 * 1024 * 1024; // should be enough for removing up to a million nodes
 /**
  * Removes `count` number of leaf nodes, starting from the `start` index
  * and leaves the tree in a balanced state.
@@ -134,14 +135,14 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
   if (start + count > root.getField(Size)) {
     throw new Error('Count out of bounds');
   }
+  let sanityChecker = ENDLESS_LOOP_BREAKER;
 
-  let sanityChecker = 1000000;
-  // printtree(root);
   // After each node removal, we rebalance and start over again
   // from the root. The `count` will be decremented, but the `start`
   // index will remain the same. We *can* remove entire subtrees.
   // however, due to how the balancing algo works, we can't remove
   // multiple siblings / cousins and rebalance afterwards.
+
   while (count) {
     let node: BaseNode<T> = root;
     let tmpStart = start;
