@@ -131,6 +131,10 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
     throw new Error('Index out of bounds');
   }
 
+  if (start + count > root.getField(Size)) {
+    throw new Error('Count out of bounds');
+  }
+
   let sanityChecker = 1000000;
   // printtree(root);
   // After each node removal, we rebalance and start over again
@@ -161,8 +165,6 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
             const parent = node.parent;
             parent.pop(node.index);
             parent.rebalance();
-            // console.log('1:', count);
-            // printtree(root);
             break;
           }
         }
@@ -175,8 +177,6 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
             node.pop(0);
           }
           node.rebalance();
-          // console.log('2:', count);
-          // printtree(root);
           break;
         }
 
@@ -196,25 +196,11 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
         // them instead of doing the inner loop again.
         // Also, tmpStart can be only 1 or 2 here.
         if (node.a instanceof Leaf) {
-          console.log('loop da loop');
-          printtree(root);
           while (count && node.size > tmpStart) {
-            // console.log('Count', count, 'nodesize', node.size, 'tmpstart', tmpStart);
-            console.log(
-              'Pop to happen, count =',
-              count,
-              'node.size =',
-              node.size,
-              'pop at = ',
-              tmpStart,
-            );
             count -= 1;
             node.pop(tmpStart as 1 | 2);
           }
           node.rebalance();
-          console.log('3:', count);
-          printtree(root);
-          // node.rebalance();
           break;
         }
 
