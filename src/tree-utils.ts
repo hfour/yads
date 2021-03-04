@@ -131,6 +131,8 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
     throw new Error('Index out of bounds');
   }
 
+  let sanityChecker = 1000000;
+  // printtree(root);
   // After each node removal, we rebalance and start over again
   // from the root. The `count` will be decremented, but the `start`
   // index will remain the same. We *can* remove entire subtrees.
@@ -141,6 +143,9 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
     let tmpStart = start;
 
     while (node instanceof INode) {
+      if (--sanityChecker < 0) {
+        throw new Error('Endless loop');
+      }
       if (tmpStart === 0) {
         // We have the oportunity to remove the entire node if count is bigger than it
         if (count >= node.getField(Size)) {
@@ -156,6 +161,8 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
             const parent = node.parent;
             parent.pop(node.index);
             parent.rebalance();
+            // console.log('1:', count);
+            // printtree(root);
             break;
           }
         }
@@ -168,6 +175,8 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
             node.pop(0);
           }
           node.rebalance();
+          // console.log('2:', count);
+          // printtree(root);
           break;
         }
 
@@ -187,11 +196,25 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
         // them instead of doing the inner loop again.
         // Also, tmpStart can be only 1 or 2 here.
         if (node.a instanceof Leaf) {
-          while (count && node.size > 1) {
+          console.log('loop da loop');
+          printtree(root);
+          while (count && node.size > tmpStart) {
+            // console.log('Count', count, 'nodesize', node.size, 'tmpstart', tmpStart);
+            console.log(
+              'Pop to happen, count =',
+              count,
+              'node.size =',
+              node.size,
+              'pop at = ',
+              tmpStart,
+            );
             count -= 1;
             node.pop(tmpStart as 1 | 2);
           }
           node.rebalance();
+          console.log('3:', count);
+          printtree(root);
+          // node.rebalance();
           break;
         }
 
@@ -292,4 +315,40 @@ export function* iterateData<T>(root: INode<T>, index?: number, count?: number) 
   for (let item of iterate(root, index, count)) {
     yield item.data;
   }
+}
+
+/**
+ * Converts a tree to an array consumable by `asciitree`.
+ */
+function toDebugArray(root: BaseNode<any>, pos?: string): any[];
+function toDebugArray(root: Leaf<any>, pos?: string): string;
+function toDebugArray(root: INode<any>, pos?: string): any[];
+function toDebugArray(root: BaseNode<any>, pos: string = 'R') {
+  if (root instanceof INode) {
+    const arr: any[] = [pos];
+    if (root.a) {
+      arr.push(toDebugArray(root.a, 'a'));
+    }
+    if (root.b) {
+      arr.push(toDebugArray(root.b, 'b'));
+    }
+    if (root.c) {
+      arr.push(toDebugArray(root.c, 'c'));
+    }
+    if (root.d) {
+      arr.push(toDebugArray(root.d, 'd'));
+    }
+    return arr;
+  } else if (root instanceof Leaf) {
+    return root.data;
+  } else {
+    return '[No Tree]';
+  }
+}
+
+/**
+ * Uses the "asciitree" library to print a tree to a string.
+ */
+export function printtree<T>(root: INode<T>) {
+  console.log(toDebugArray(root));
 }

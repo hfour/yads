@@ -257,7 +257,7 @@ export class MArray<T> {
     return accumulator;
   }
 
-  map(operation: (item: T, index?: number, arr?: this) => any, thisArg?: any): MArray<any> {
+  map<U>(operation: (item: T, index?: number, arr?: this) => U, thisArg?: any): MArray<U> {
     let index = 0;
     let result = [];
 
