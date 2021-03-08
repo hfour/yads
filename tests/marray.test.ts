@@ -2,7 +2,7 @@ import * as fc from 'fast-check';
 import { MArray } from '../src';
 
 describe('mArray', () => {
-  it.only('slice should work with randomly generated splice operations', () => {
+  it('slice should work with randomly generated splice operations', () => {
     fc.assert(
       fc.property(
         fc.array(fc.integer(), { maxLength: 1000 }),
