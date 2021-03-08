@@ -131,7 +131,8 @@ export class MArray<T> {
    */
   splice(at: number, deleteCount?: number, ...items: T[]) {
     let deletedElements = new MArray<T>();
-    at = at < 0 ? this.length + at : at;
+    // Specs: https://tc39.es/ecma262/#sec-array.prototype.splice
+    at = at < 0 ? Math.max(this.length + at, 0) : Math.min(this.length, at);
 
     if (at + deleteCount > this.length) {
       deleteCount = this.length - at;
