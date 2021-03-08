@@ -9,6 +9,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "asciitree": "^1.0.2",
+    "fast-check": "^2.13.0",
     "jest": "^26.6.3",
     "parcel-bundler": "^1.12.0",
     "prettier": "^1.16.4",
