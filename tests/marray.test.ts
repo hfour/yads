@@ -27,9 +27,6 @@ describe('mArray', () => {
           }
         },
       ),
-      {
-        numRuns: 50,
-      },
     );
   });
 });
