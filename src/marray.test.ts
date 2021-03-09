@@ -1,5 +1,5 @@
 import * as fc from 'fast-check';
-import { MArray } from '../src';
+import { MArray } from '.';
 
 describe('mArray', () => {
   it('slice should work with randomly generated splice operations', () => {
