@@ -10,8 +10,8 @@ describe('mArray', () => {
         fc.array(fc.integer(), { maxLength: ARR_MAX_LENGTH }),
         fc.array(
           fc.record({
-            at: fc.integer(-ARR_MAX_LENGTH * 2, ARR_MAX_LENGTH * 2), // So the prob a case where the index is out of bounds is between 0-50%
-            deleteCount: fc.integer(-ARR_MAX_LENGTH * 2, ARR_MAX_LENGTH * 2), // So the prob a case where the count is out of bounds is between 0-50%
+            at: fc.integer(-ARR_MAX_LENGTH * 2, ARR_MAX_LENGTH * 2), // So the prob distrib a case where the index is out of bounds is between 0-50%
+            deleteCount: fc.integer(-ARR_MAX_LENGTH * 2, ARR_MAX_LENGTH * 2), // So the prob distrib a case where the count is out of bounds is between 0-50%
             add: fc.array(fc.integer(), { maxLength: ARR_MAX_LENGTH }),
           }),
         ),
