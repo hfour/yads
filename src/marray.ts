@@ -302,18 +302,21 @@ export class MArray<T> {
   }
 
   indexOf(itemToFind: T, fromIndex?: number): number {
+    let len = this.length;
+
     if (fromIndex === undefined) {
       fromIndex = 0;
-    } else if (fromIndex < 0 && fromIndex >= -this.length) {
-      fromIndex = this.length + fromIndex;
-    } else if (fromIndex < -this.length || fromIndex >= this.length) {
+    } else if (fromIndex < 0 && fromIndex >= -len) {
+      fromIndex = len + fromIndex;
+    } else if (fromIndex < -len || fromIndex >= len) {
       return -1;
     }
 
-    for (let index = fromIndex; index < this.length; index++) {
-      let item = this[index];
+    let index = fromIndex;
+    for (let item of tu.iterateData(this.$data, fromIndex, len)) {
       let found = item === itemToFind;
       if (found) return index;
+      ++index;
     }
     return -1;
   }

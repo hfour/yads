@@ -87,6 +87,7 @@ describe('array', () => {
       let res = a.indexOf('rgb');
       let resNot = a.indexOf('ghost');
       let resFromIndex = a.indexOf('rgb', 4);
+      let resExactlyAt = a.indexOf('zx', 2);
       let resFromNegativeIndex = a.indexOf('rgb', -4);
       let resUpperBound = a.indexOf('ba', 5);
       let resOverUpperBound = a.indexOf('ba', 6);
@@ -96,6 +97,7 @@ describe('array', () => {
       expect(res).toEqual(3);
       expect(resNot).toEqual(-1);
       expect(resFromIndex).toEqual(-1);
+      expect(resExactlyAt).toEqual(2);
       expect(resFromNegativeIndex).toEqual(3);
       expect(resUpperBound).toEqual(5);
       expect(resOverUpperBound).toEqual(-1);
