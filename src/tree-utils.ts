@@ -124,15 +124,16 @@ const ENDLESS_LOOP_BREAKER = 20 * 1024 * 1024; // should be enough for removing 
  * and leaves the tree in a balanced state.
  */
 export function remove<T>(root: INode<T>, start: number, count: number) {
+  let size = root.getField(Size);
   if (start < 0) {
-    start = root.getField(Size) + start;
+    start = size + start;
   }
 
-  if (start > root.getField(Size) - 1 || start < 0) {
+  if (start > size - 1 || start < 0) {
     throw new Error('Index out of bounds');
   }
 
-  if (start + count > root.getField(Size)) {
+  if (start + count > size) {
     throw new Error('Count out of bounds');
   }
   let sanityChecker = ENDLESS_LOOP_BREAKER;
