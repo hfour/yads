@@ -4,19 +4,27 @@ import { EventHandler, toInteger } from './marray-utils';
 
 export class MArray<T> {
   [n: number]: T;
+
   private $data: ts.INode<T>;
   private onCreateHandler: EventHandler<T>;
   private onRemoveHandler: EventHandler<T>;
+
+  private readonly _leafMap: Map<T, ts.Leaf<T>> = new Map<T, ts.Leaf<T>>();
 
   static from<T>(items: Iterable<T>) {
     const arr = new MArray<T>();
     if (Array.isArray(items)) arr.$data = tu.fromArray(items);
     else arr.$data = tu.fromArray([...items]);
+
+    arr.populateLeafMap();
+
     return arr;
   }
 
   constructor(...items: T[]) {
     this.$data = tu.fromArray(items);
+    this.populateLeafMap();
+
     this.onCreateHandler = new EventHandler();
     this.onRemoveHandler = new EventHandler();
 
@@ -39,6 +47,12 @@ export class MArray<T> {
     });
   }
 
+  private populateLeafMap(): void {
+    for (const leaf of tu.iterate(this.$data)) {
+      this._leafMap.set(leaf.data, leaf);
+    }
+  }
+
   track(onCreated: (t: T) => void, onRemoved: (t: T) => void) {
     this.onCreateHandler.addListener(onCreated);
     this.onRemoveHandler.addListener(onRemoved);
@@ -54,8 +68,12 @@ export class MArray<T> {
    * @param item the content
    */
   private insert(at: number, items: T[]) {
-    tu.insert(this.$data, at, items);
-    items.forEach(i => this.onCreateHandler.run(i));
+    const leafs = tu.insert(this.$data, at, items);
+
+    leafs.forEach(l => {
+      this._leafMap.set(l.data, l);
+      this.onCreateHandler.run(l.data);
+    });
   }
 
   /**
@@ -64,11 +82,13 @@ export class MArray<T> {
    * @param count number of items to be removed
    */
   private remove(start: number, count: number) {
-    let removed;
+    let removed: MArray<T>;
     if (count > 0) removed = this.slice(start, start + count);
     tu.remove(this.$data, start, count);
+
     for (let i of removed) {
       this.onRemoveHandler.run(i);
+      this._leafMap.delete(i);
     }
   }
 
@@ -316,6 +336,21 @@ export class MArray<T> {
       if (found) return index;
     }
     return -1;
+  }
+
+  fastIndexOf(itemToFind: T, fromIndex?: number): number {
+    if (fromIndex === undefined) {
+      fromIndex = 0;
+    } else if (fromIndex < 0 && fromIndex >= -this.length) {
+      fromIndex = this.length + fromIndex;
+    } else if (fromIndex < -this.length || fromIndex >= this.length) {
+      return -1;
+    }
+
+    const leaf = this._leafMap.get(itemToFind);
+    const index = tu.indexOf(leaf);
+
+    return index >= fromIndex ? index : -1;
   }
 
   get length() {
