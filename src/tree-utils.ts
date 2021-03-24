@@ -68,6 +68,25 @@ export function atIndex<T>(root: BaseNode<T>, index: number) {
   return root as Leaf<T>;
 }
 
+export function indexOf<T>(leaf: Leaf<T>): number {
+  if (leaf == null) return -1;
+
+  let index = leaf.index;
+  let parent = leaf.parent;
+
+  while (parent != null) {
+    let prevSibling = parent.prevSibling;
+    while (prevSibling != null) {
+      index += prevSibling.getField(Size);
+      prevSibling = prevSibling.prevSibling;
+    }
+
+    parent = parent.parent;
+  }
+
+  return index;
+}
+
 export function foldToIndex<T, U>(root: BaseNode<T>, index: number, monoid: MonoidObj<U, T>): U {
   if (index > root.getField(Size) || index < 0) {
     throw new Error('Index out of bounds');
@@ -234,7 +253,7 @@ export function remove<T>(root: INode<T>, start: number, count: number) {
  *   2. Combine the insertees into a tree and insert entire subtrees at once
  *   3. Accept a ready-made tree instead of an array data (reuse the cache)
  */
-export function insert<T>(root: INode<T>, index: number, insertees: T[]) {
+export function insert<T>(root: INode<T>, index: number, insertees: T[]): Leaf<T>[] {
   if (index < 0) {
     index = root.getField(Size) + index;
   }
@@ -260,13 +279,20 @@ export function insert<T>(root: INode<T>, index: number, insertees: T[]) {
     childIndex = node.index;
   }
 
+  const leafs = new Array<Leaf<T>>();
   for (let i = insertees.length - 1; i >= 0; --i) {
     node = new Leaf(insertees[i]);
+
     parent.push(node, childIndex);
     parent.rebalance();
     parent = node.parent;
+
     childIndex = node.index;
+
+    leafs.push(node);
   }
+
+  return leafs;
 }
 
 /**
