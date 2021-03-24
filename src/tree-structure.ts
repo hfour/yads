@@ -171,6 +171,7 @@ export class INode<T> extends BaseNode<T> {
     }
   }
 
+  @computed
   get a() {
     return this._0;
   }
@@ -183,6 +184,7 @@ export class INode<T> extends BaseNode<T> {
     }
   }
 
+  @computed
   get b() {
     return this._1;
   }
@@ -195,6 +197,7 @@ export class INode<T> extends BaseNode<T> {
     }
   }
 
+  @computed
   get c() {
     return this._2;
   }
@@ -207,6 +210,7 @@ export class INode<T> extends BaseNode<T> {
     }
   }
 
+  @computed
   get d() {
     return this._3;
   }
