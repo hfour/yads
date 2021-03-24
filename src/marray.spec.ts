@@ -103,6 +103,28 @@ describe('array', () => {
       expect(resOverLowerBound).toEqual(-1);
     });
 
+    it('Finds index of a thing, [ .fastIndexOf(x[, i]) ]', () => {
+      let a = new MArray('xy', 'yz', 'zx', 'rgb', 'gb', 'ba');
+
+      let res = a.fastIndexOf('rgb');
+      let resNot = a.fastIndexOf('ghost');
+      let resFromIndex = a.fastIndexOf('rgb', 4);
+      let resFromNegativeIndex = a.fastIndexOf('rgb', -4);
+      let resUpperBound = a.fastIndexOf('ba', 5);
+      let resOverUpperBound = a.fastIndexOf('ba', 6);
+      let resLowerBound = a.fastIndexOf('xy', -6);
+      let resOverLowerBound = a.fastIndexOf('ba', -7);
+
+      expect(res).toEqual(3);
+      expect(resNot).toEqual(-1);
+      expect(resFromIndex).toEqual(-1);
+      expect(resFromNegativeIndex).toEqual(3);
+      expect(resUpperBound).toEqual(5);
+      expect(resOverUpperBound).toEqual(-1);
+      expect(resLowerBound).toEqual(0);
+      expect(resOverLowerBound).toEqual(-1);
+    });
+
     it('every() returns true if all elements satisfy a predicate', () => {
       let a = new MArray('xy', 'xz', 'rxb', 'gxb', 'bx');
 
