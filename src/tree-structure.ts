@@ -45,7 +45,7 @@ export class BaseNode<T> {
   /**
    * Node's index within its parent
    */
-  index: ChildIndex = null;
+  @observable index: ChildIndex = null;
 
   /**
    * Lazily cache and get cached value.
