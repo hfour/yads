@@ -1,4 +1,26 @@
+import { autorun, computed } from 'mobx';
 import { MArray } from './marray';
+
+class Parent {
+  children: MArray<Child> = MArray.from([]);
+
+  addChild(child: Child, index: number = this.children.length): void {
+    this.children.splice(index, 0, child);
+  }
+}
+
+class Child {
+  parent: Parent;
+
+  constructor(parent: Parent) {
+    this.parent = parent;
+  }
+
+  @computed
+  get index(): number {
+    return this.parent.children.fastIndexOf(this);
+  }
+}
 
 const Total = {
   operation: (a: number, b: number) => a + b,
@@ -649,5 +671,32 @@ describe('MArray track array functionality test suite', () => {
 
     expect(marr).toEqual(MArray.from([500, 400, 300, 200, 100]));
     expect([removed.length, added.length]).toEqual([2, 2]); // the changes after the untrack should't be added
+  });
+
+  it("updates/invalidates index's cache", () => {
+    const p = new Parent();
+    const c0 = new Child(p);
+    const c1 = new Child(p);
+    const c2 = new Child(p);
+    const c3 = new Child(p);
+
+    p.addChild(c0);
+    p.addChild(c1);
+    p.addChild(c2);
+    debugger;
+    const disposer = autorun(() => {
+      console.log(c2.index);
+    });
+
+    p.addChild(c3, 1);
+
+    try {
+      expect(c0.index).toEqual(0);
+      expect(c1.index).toEqual(2);
+      expect(c2.index).toEqual(3);
+      expect(c3.index).toEqual(1);
+    } finally {
+      disposer();
+    }
   });
 });
